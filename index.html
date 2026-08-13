@@ -1,0 +1,2279 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚾️咖哇棒卡團拆人生 — MLB 團拆模擬器</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+:root{
+  --ink:#0f2438;
+  --stadium:#152e24;
+  --stadium-deep:#0b1f18;
+  --chalk:#f6f2e7;
+  --card-stock:#efe8d6;
+  --foil:#c9a227;
+  --foil-bright:#e8c766;
+  --rare:#b8382e;
+  --good:#5fae7a;
+  --line:rgba(246,242,231,0.14);
+  --muted:rgba(246,242,231,0.55);
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  background:
+    radial-gradient(ellipse at 50% -10%, #1d4433 0%, var(--stadium) 45%, var(--stadium-deep) 100%);
+  color:var(--chalk);
+  font-family:'Inter',sans-serif;
+  min-height:100vh;
+  padding:40px 20px 80px;
+}
+.wrap{max-width:1040px;margin:0 auto;}
+
+/* ---- Hero ---- */
+.hero{
+  text-align:center;
+  padding:20px 0 44px;
+  border-bottom:1px solid var(--line);
+  margin-bottom:36px;
+  position:relative;
+}
+.eyebrow{
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;
+  letter-spacing:.28em;
+  color:var(--foil-bright);
+  text-transform:uppercase;
+  margin-bottom:14px;
+}
+h1{
+  font-family:'Oswald',sans-serif;
+  font-weight:700;
+  font-size:clamp(36px,6vw,64px);
+  letter-spacing:.01em;
+  margin:0 0 10px;
+  line-height:1.05;
+  text-transform:uppercase;
+}
+h1 span{color:var(--foil-bright);}
+.sub{color:var(--muted);font-size:15px;max-width:520px;margin:0 auto;line-height:1.6;}
+
+/* ---- Panels ---- */
+.panel{
+  background:rgba(246,242,231,0.04);
+  border:1px solid var(--line);
+  border-radius:4px;
+  padding:28px;
+  margin-bottom:28px;
+}
+.panel h2{
+  font-family:'Oswald',sans-serif;
+  text-transform:uppercase;
+  font-size:20px;
+  letter-spacing:.04em;
+  margin:0 0 6px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.panel h2 .num{
+  font-family:'JetBrains Mono',monospace;
+  font-size:13px;
+  color:var(--foil-bright);
+  border:1px solid var(--foil);
+  padding:2px 8px;
+  border-radius:2px;
+}
+.panel .desc{color:var(--muted);font-size:14px;margin-bottom:20px;line-height:1.6;}
+
+textarea{
+  width:100%;
+  min-height:150px;
+  background:rgba(0,0,0,0.25);
+  border:1px solid var(--line);
+  border-radius:3px;
+  color:var(--chalk);
+  font-family:'JetBrains Mono',monospace;
+  font-size:13px;
+  padding:14px;
+  resize:vertical;
+  line-height:1.7;
+}
+textarea:focus{outline:2px solid var(--foil-bright);outline-offset:1px;}
+textarea::placeholder{color:rgba(246,242,231,0.3);}
+
+.field{display:flex;flex-direction:column;gap:6px;}
+.field label{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:.05em;}
+input[type="text"], input[type="number"]{
+  background:rgba(0,0,0,0.25);
+  border:1px solid var(--line);
+  border-radius:3px;
+  color:var(--chalk);
+  font-family:'JetBrains Mono',monospace;
+  font-size:14px;
+  padding:11px 12px;
+  min-width:140px;
+}
+input[type="number"]{width:100px;min-width:0;}
+input:focus{outline:2px solid var(--foil-bright);outline-offset:1px;}
+input:disabled{opacity:.4;}
+
+.slot.mine{border-color:var(--foil-bright);box-shadow:0 0 0 1px var(--foil-bright) inset;}
+.slot .mine-tag{
+  display:inline-block;
+  font-family:'JetBrains Mono',monospace;
+  font-size:9.5px;
+  color:var(--ink);
+  background:var(--foil-bright);
+  padding:1px 6px;
+  border-radius:2px;
+  margin-left:6px;
+  letter-spacing:.02em;
+}
+.stack.mine{border-color:var(--foil-bright);box-shadow:0 0 16px rgba(232,199,102,0.18);}
+.stack-head .owner.mine{color:var(--foil-bright);font-weight:600;}
+
+.row{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-top:16px;}
+.count-hint{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);}
+.count-hint.warn{color:#ff9d90;}
+
+button{
+  font-family:'Oswald',sans-serif;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+  font-size:14px;
+  font-weight:600;
+  border:none;
+  padding:13px 26px;
+  border-radius:3px;
+  cursor:pointer;
+  transition:transform .12s ease, box-shadow .12s ease;
+}
+button:focus-visible{outline:2px solid var(--foil-bright);outline-offset:2px;}
+.btn-primary{
+  background:linear-gradient(135deg,var(--foil-bright),var(--foil));
+  color:var(--ink);
+}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(201,162,39,0.3);}
+.btn-primary:disabled{opacity:.35;cursor:not-allowed;transform:none;box-shadow:none;}
+.btn-ghost{
+  background:transparent;
+  border:1px solid var(--line);
+  color:var(--chalk);
+}
+.btn-ghost:hover{border-color:var(--foil-bright);color:var(--foil-bright);}
+.btn-small{padding:8px 14px;font-size:11px;}
+
+/* ---- Draft board ---- */
+.board{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+  gap:10px;
+  margin-top:20px;
+}
+.slot{
+  border:1px solid var(--line);
+  border-radius:3px;
+  padding:12px 12px 14px;
+  background:rgba(0,0,0,0.2);
+  position:relative;
+  overflow:hidden;
+}
+.slot .pick{
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;
+  color:var(--muted);
+  margin-bottom:6px;
+}
+.slot .team{
+  font-family:'Oswald',sans-serif;
+  font-weight:600;
+  font-size:14px;
+  letter-spacing:.02em;
+}
+.slot .name{font-size:12px;color:var(--muted);margin-top:4px;}
+.slot .bar{position:absolute;left:0;top:0;bottom:0;width:4px;}
+
+/* ---- Break grid / pulls (reused for "my results" buckets) ---- */
+.break-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+  gap:16px;
+  margin-top:22px;
+}
+.stack{
+  border:1px solid var(--line);
+  border-radius:5px;
+  overflow:hidden;
+  background:rgba(0,0,0,0.22);
+}
+.stack-head{
+  padding:12px 14px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border-bottom:1px solid var(--line);
+}
+.stack-head .team{font-family:'Oswald',sans-serif;font-weight:600;font-size:15px;}
+.stack-head .owner{font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;}
+.stack-body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:8px;}
+
+.pull{
+  border-radius:3px;
+  padding:9px 11px;
+  font-size:12.5px;
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+  border:1px solid var(--line);
+  background:rgba(246,242,231,0.03);
+  opacity:0;
+  transform:translateY(6px);
+  animation:reveal .35s ease forwards;
+}
+@keyframes reveal{to{opacity:1;transform:translateY(0);}}
+.pull-top{display:flex;justify-content:space-between;align-items:center;gap:8px;}
+.pull-price{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  font-family:'JetBrains Mono',monospace;
+  font-size:10.5px;
+  color:var(--chalk);
+  border-top:1px dashed var(--line);
+  padding-top:5px;
+}
+.pull .pname{font-weight:600;}
+.pull .pmeta{color:var(--muted);font-size:10.5px;font-family:'JetBrains Mono',monospace;margin-left:6px;}
+.pull .ptag{
+  font-family:'JetBrains Mono',monospace;
+  font-size:9.5px;
+  padding:2px 6px;
+  border-radius:2px;
+  white-space:nowrap;
+  letter-spacing:.02em;
+}
+.pull .rc-badge{
+  font-family:'JetBrains Mono',monospace;
+  font-size:8.5px;
+  color:var(--foil-bright);
+  border:1px solid var(--foil);
+  padding:0 4px;
+  border-radius:2px;
+  margin-left:6px;
+  vertical-align:middle;
+}
+.pull.rarity-base{border-color:var(--line);}
+.pull.rarity-base .ptag{background:rgba(246,242,231,0.1);color:var(--muted);}
+.pull.rarity-refractor{border-color:rgba(120,170,220,0.4);}
+.pull.rarity-refractor .ptag{background:rgba(120,170,220,0.18);color:#9cc4ec;}
+.pull.rarity-numbered{border-color:var(--foil);background:rgba(201,162,39,0.08);}
+.pull.rarity-numbered .ptag{background:rgba(201,162,39,0.25);color:var(--foil-bright);}
+.pull.rarity-insert{border-color:rgba(190,140,230,0.45);}
+.pull.rarity-insert .ptag{background:rgba(190,140,230,0.2);color:#d3aef2;}
+.pull.rarity-auto{border-color:var(--rare);background:rgba(184,56,46,0.1);box-shadow:0 0 0 1px rgba(184,56,46,0.25) inset;}
+.pull.rarity-auto .ptag{background:rgba(184,56,46,0.3);color:#ff9d90;}
+.pull.rarity-case_hit{
+  border-color:var(--foil-bright);
+  background:linear-gradient(90deg,rgba(201,162,39,0.22),rgba(184,56,46,0.16));
+  box-shadow:0 0 14px rgba(201,162,39,0.35);
+}
+.pull.rarity-case_hit .ptag{background:var(--foil-bright);color:var(--ink);font-weight:700;}
+
+/* ---- Odds / stats reference box (reused for career bar + settlement) ---- */
+.stats-box{
+  border:1px solid var(--line);
+  border-radius:4px;
+  background:rgba(0,0,0,0.2);
+  padding:16px 18px;
+  margin-bottom:20px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;
+  line-height:1.9;
+  color:var(--muted);
+}
+.stats-box .stats-title{
+  color:var(--foil-bright);
+  font-size:11px;
+  letter-spacing:.1em;
+  margin-bottom:8px;
+  text-transform:uppercase;
+}
+.stats-box b{color:var(--chalk);font-weight:600;}
+.stats-box .odds-row{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+.stats-box .odds-row + .odds-row{margin-top:2px;}
+
+/* ---- Career bar ---- */
+.stat-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
+  gap:14px;
+  margin-top:6px;
+}
+.stat-cell{
+  border:1px solid var(--line);
+  border-radius:3px;
+  padding:12px 14px;
+  background:rgba(0,0,0,0.18);
+}
+.stat-cell .lbl{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;}
+.stat-cell .val{font-family:'Oswald',sans-serif;font-size:19px;font-weight:600;}
+.stat-cell .val.pos{color:var(--good);}
+.stat-cell .val.neg{color:#ff9d90;}
+.stat-cell .val.gold{color:var(--foil-bright);}
+
+/* ---- Bucket list (my pulls) ---- */
+.bucket{margin-top:18px;}
+.bucket-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:10px;
+}
+.bucket-head .bname{
+  font-family:'Oswald',sans-serif;
+  text-transform:uppercase;
+  font-size:14px;
+  letter-spacing:.04em;
+  color:var(--foil-bright);
+}
+.bucket-head .bcount{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);}
+.bucket-list{display:flex;flex-direction:column;gap:8px;}
+.bucket-empty{color:var(--muted);font-size:12px;font-family:'JetBrains Mono',monospace;padding:6px 0;}
+
+.base-summary{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-top:22px;
+  padding-top:18px;
+  border-top:1px solid var(--line);
+}
+.base-summary .bcount{font-family:'Oswald',sans-serif;font-size:15px;font-weight:600;}
+.base-list{
+  margin-top:10px;
+  display:none;
+  flex-direction:column;
+  gap:6px;
+  max-height:260px;
+  overflow-y:auto;
+}
+.base-list.open{display:flex;}
+
+/* ---- Settlement ---- */
+.price-null{color:var(--muted);font-style:italic;}
+
+/* ---- Bankrupt screen ---- */
+.bankrupt{
+  text-align:center;
+  padding:50px 20px;
+}
+.bankrupt .skull{font-size:56px;margin-bottom:10px;}
+.bankrupt h2{
+  font-family:'Oswald',sans-serif;
+  font-size:30px;
+  text-transform:uppercase;
+  color:var(--rare);
+  margin:0 0 18px;
+}
+.bankrupt .bstat-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:14px;
+  max-width:640px;
+  margin:0 auto 26px;
+}
+
+/* ---- Best hit banner ---- */
+.banner{
+  margin-top:26px;
+  border:1px solid var(--foil);
+  background:linear-gradient(120deg,rgba(201,162,39,0.14),rgba(184,56,46,0.08));
+  border-radius:5px;
+  padding:22px 26px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:14px;
+}
+.banner .label{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.2em;color:var(--foil-bright);text-transform:uppercase;margin-bottom:6px;}
+.banner .headline{font-family:'Oswald',sans-serif;font-size:22px;font-weight:600;}
+.banner .headline b{color:var(--foil-bright);}
+.banner .owner-tag{font-size:13px;color:var(--muted);}
+
+.foot-note{
+  text-align:center;
+  color:var(--muted);
+  font-size:12px;
+  margin-top:40px;
+  line-height:1.7;
+}
+
+@media (prefers-reduced-motion: reduce){
+  .pull{animation:none;opacity:1;transform:none;}
+  button:hover{transform:none;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">Random Team Break Simulator · Bankroll Mode</div>
+    <h1>⚾️咖哇棒卡<span>團拆人生</span></h1>
+    <p class="sub">每場固定拆 1 Case（12 箱）2026 Topps Chrome Baseball，真實官方機率，真實選手名單，看你的 $2,000 USD 能撐幾場。（頁面內所有金額皆為美金 USD）</p>
+  </div>
+
+  <!-- Career bar -->
+  <div class="panel" id="career-bar">
+    <h2>生涯紀錄</h2>
+    <p class="desc">資料存在瀏覽器 localStorage，重新整理不會消失。</p>
+    <div class="stat-grid" id="career-grid"></div>
+    <div class="row">
+      <button class="btn-ghost btn-small" id="btn-reset-career">🔄 重新開始人生</button>
+    </div>
+  </div>
+
+  <!-- STEP 1: participants -->
+  <div class="panel" id="panel-setup">
+    <h2><span class="num">01</span> 你的參團設定</h2>
+    <p class="desc">本場固定開整箱 Case（2026 Topps Chrome Baseball Jumbo）：8 Boxes × 12 Packs × 11 Cards = 1,056 張卡。你買 1～5 注，每注 $150 USD，隨機分配球隊（30 隊完全等機率）。參團費會在分隊當下立即從現金扣除。（本頁所有金額皆為美金 USD）</p>
+    <div class="row" style="margin-top:0;">
+      <div class="field">
+        <label for="nickname">你的暱稱</label>
+        <input type="text" id="nickname" placeholder="Tony" value="Tony">
+      </div>
+      <div class="field">
+        <label for="entries">你買幾注（$150/注）</label>
+        <input type="number" id="entries" min="1" max="5" value="2">
+      </div>
+    </div>
+    <div class="row">
+      <button class="btn-primary" id="btn-draft">🎲 隨機分配球隊並付款</button>
+      <span class="count-hint" id="count-hint">尚未分配</span>
+    </div>
+  </div>
+
+  <!-- STEP 2: draft board -->
+  <div class="panel" id="panel-board" style="display:none;">
+    <h2><span class="num">02</span> 你本場抽到</h2>
+    <p class="desc">付款已完成，準備開拆。</p>
+    <div class="board" id="board"></div>
+    <div class="row">
+      <button class="btn-primary" id="btn-break">📦 開拆整箱 Case</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: break results -->
+  <div class="panel" id="panel-results" style="display:none;">
+    <h2><span class="num">03</span> 拆卡結果</h2>
+    <p class="desc">機率、選手與 Case 規格完全比照 2026 Topps Chrome Baseball Jumbo 官方數據，逐包獨立模擬，沒有額外加成。</p>
+    <div class="stats-box" id="stats-box"></div>
+
+    <div id="my-results"></div>
+
+    <div class="stats-box" id="settle-box" style="margin-top:22px;"></div>
+
+    <div class="banner" id="banner" style="display:none;"></div>
+    <div class="row" style="margin-top:22px;">
+      <button class="btn-ghost" id="btn-again">🔁 再團一場</button>
+    </div>
+  </div>
+
+  <!-- Bankrupt screen -->
+  <div class="panel bankrupt" id="panel-bankrupt" style="display:none;">
+    <div class="skull">💀</div>
+    <h2>你破產了</h2>
+    <div class="bstat-grid" id="bankrupt-grid"></div>
+    <button class="btn-primary" id="btn-restart">🔄 重新開始人生</button>
+  </div>
+
+  <div class="foot-note">球員、Case 規格與所有 Jumbo pack odds 均取自 2026 Topps Chrome Baseball 官方公開資訊。系統買回價為純遊戲內經濟（RARITY_BUYBACK_TABLE × Hobby 市場熱度權重），不代表真實卡片市場行情。拆卡結果為依真實官方比例的隨機模擬，非真實購買紀錄。</div>
+</div>
+
+<script>
+
+// ============ Team meta (colors reused for board display) ============
+const TEAMS = [
+  {abbr:"NYY",name:"New York Yankees",c1:"#0c2340",c2:"#c4ced3"},
+  {abbr:"BOS",name:"Boston Red Sox",c1:"#bd3039",c2:"#0c2340"},
+  {abbr:"TOR",name:"Toronto Blue Jays",c1:"#134a8e",c2:"#e8291c"},
+  {abbr:"BAL",name:"Baltimore Orioles",c1:"#df4601",c2:"#000000"},
+  {abbr:"TB",name:"Tampa Bay Rays",c1:"#092c5c",c2:"#8fbce6"},
+  {abbr:"CLE",name:"Cleveland Guardians",c1:"#00385d",c2:"#e50022"},
+  {abbr:"MIN",name:"Minnesota Twins",c1:"#002b5c",c2:"#d31145"},
+  {abbr:"CWS",name:"Chicago White Sox",c1:"#27251f",c2:"#c4ced4"},
+  {abbr:"DET",name:"Detroit Tigers",c1:"#0c2340",c2:"#fa4616"},
+  {abbr:"KC",name:"Kansas City Royals",c1:"#004687",c2:"#bd9b60"},
+  {abbr:"HOU",name:"Houston Astros",c1:"#002d62",c2:"#eb6e1f"},
+  {abbr:"TEX",name:"Texas Rangers",c1:"#003278",c2:"#c0111f"},
+  {abbr:"SEA",name:"Seattle Mariners",c1:"#0c2c56",c2:"#005c5c"},
+  {abbr:"LAA",name:"Los Angeles Angels",c1:"#ba0021",c2:"#003263"},
+  {abbr:"ATH",name:"Athletics",c1:"#003831",c2:"#efb21e"},
+  {abbr:"ATL",name:"Atlanta Braves",c1:"#ce1141",c2:"#13274f"},
+  {abbr:"PHI",name:"Philadelphia Phillies",c1:"#e81828",c2:"#002d72"},
+  {abbr:"NYM",name:"New York Mets",c1:"#002d72",c2:"#ff5910"},
+  {abbr:"MIA",name:"Miami Marlins",c1:"#00a3e0",c2:"#ef3340"},
+  {abbr:"WSH",name:"Washington Nationals",c1:"#ab0003",c2:"#14225a"},
+  {abbr:"MIL",name:"Milwaukee Brewers",c1:"#12284b",c2:"#ffc52f"},
+  {abbr:"CHC",name:"Chicago Cubs",c1:"#0e3386",c2:"#cc3433"},
+  {abbr:"STL",name:"St. Louis Cardinals",c1:"#c41e3a",c2:"#0c2340"},
+  {abbr:"CIN",name:"Cincinnati Reds",c1:"#c6011f",c2:"#000000"},
+  {abbr:"PIT",name:"Pittsburgh Pirates",c1:"#27251f",c2:"#fdb827"},
+  {abbr:"LAD",name:"Los Angeles Dodgers",c1:"#005a9c",c2:"#a5acaf"},
+  {abbr:"SD",name:"San Diego Padres",c1:"#2f241d",c2:"#ffc425"},
+  {abbr:"ARI",name:"Arizona Diamondbacks",c1:"#a71930",c2:"#e3d4ad"},
+  {abbr:"SF",name:"San Francisco Giants",c1:"#fd5a1e",c2:"#27251f"},
+  {abbr:"COL",name:"Colorado Rockies",c1:"#333366",c2:"#c4ced4"},
+];
+
+const TEAM_NAME_TO_ABBR = {
+  "Los Angeles Dodgers":"LAD","New York Yankees":"NYY","Houston Astros":"HOU","Milwaukee Brewers":"MIL",
+  "Philadelphia Phillies":"PHI","Cincinnati Reds":"CIN","Baltimore Orioles":"BAL","Colorado Rockies":"COL",
+  "Seattle Mariners":"SEA","Kansas City Royals":"KC","Detroit Tigers":"DET","New York Mets":"NYM",
+  "Toronto Blue Jays":"TOR","Miami Marlins":"MIA","Athletics":"ATH","Oakland Athletics":"ATH",
+  "Minnesota Twins":"MIN","Chicago Cubs":"CHC","Texas Rangers":"TEX","Los Angeles Angels":"LAA","Angels":"LAA",
+  "California Angels":"LAA","Cleveland Guardians":"CLE","Chicago White Sox":"CWS","Arizona Diamondbacks":"ARI",
+  "Tampa Bay Rays":"TB","Tampa Bay Devil Rays":"TB","St. Louis Cardinals":"STL","Washington Nationals":"WSH",
+  "Montréal Expos":"WSH","Boston Red Sox":"BOS","San Francisco Giants":"SF","Atlanta Braves":"ATL",
+  "Pittsburgh Pirates":"PIT","San Diego Padres":"SD","Florida Marlins":"MIA"
+};
+
+// ============ Real 2026 Topps Chrome Baseball Jumbo Case structure ============
+// Real 2026 Topps Chrome Baseball JUMBO Box structure (per official product config)
+const CASE_BOXES = 8;
+const BOX_PACKS = 12;
+const PACK_CARDS = 11;
+const BOX_AUTO_GUARANTEE = 2; // Jumbo boxes guarantee 2 autographs (Hobby only guarantees 1)
+const BOX_CARDS = BOX_PACKS * PACK_CARDS;      // 132
+const CASE_PACKS = CASE_BOXES * BOX_PACKS;     // 96
+const CASE_CARDS = CASE_BOXES * BOX_CARDS;     // 1,056
+
+const STARTING_CASH = 2000;
+const ENTRY_PRICE = 150;
+const MAX_ENTRIES = 5;
+
+function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+function randInt(a,b){ return a + Math.floor(Math.random()*(b-a+1)); }
+function shuffle(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+function fmt(n){ return Math.round(n).toLocaleString('en-US'); }
+function money(n){ return (n<0?'-$':'$') + fmt(Math.abs(n)) + ' USD'; }
+
+// ============ Real player pools (parsed from 2026 Topps Chrome checklist coverage) ============
+const BASE_CHECKLIST_RAW = `
+Shohei Ohtani|Los Angeles Dodgers|0
+Cody Bellinger|New York Yankees|0
+Yordan Alvarez|Houston Astros|0
+Brice Turang|Milwaukee Brewers|0
+Trea Turner|Philadelphia Phillies|0
+Sal Stewart|Cincinnati Reds|1
+Samuel Basallo|Baltimore Orioles|1
+Ezequiel Tovar|Colorado Rockies|0
+Cal Raleigh|Seattle Mariners|0
+Andy Pages|Los Angeles Dodgers|0
+Noelvi Marte|Cincinnati Reds|0
+Bobby Witt Jr.|Kansas City Royals|0
+Kyle Karros|Colorado Rockies|1
+Jack Flaherty|Detroit Tigers|0
+Christian Yelich|Milwaukee Brewers|0
+Kevin McGonigle|Detroit Tigers|1
+Juan Soto|New York Mets|0
+Dillon Dingler|Detroit Tigers|0
+Heriberto Hernández|Miami Marlins|1
+Sandy Alcantara|Miami Marlins|0
+Shane Bieber|Toronto Blue Jays|0
+Mason Barnett|Athletics|1
+Cole Young|Seattle Mariners|1
+Josh Bell|Minnesota Twins|0
+J.P. Crawford|Seattle Mariners|0
+Michael Busch|Chicago Cubs|0
+Joey Ortiz|Milwaukee Brewers|0
+Corey Seager|Texas Rangers|0
+Nico Hoerner|Chicago Cubs|0
+Alex Bregman|Chicago Cubs|0
+Bryan Woo|Seattle Mariners|0
+Isaac Paredes|Houston Astros|0
+Luisangel Acuña|Chicago White Sox|0
+Seiya Suzuki|Chicago Cubs|0
+Gleyber Torres|Detroit Tigers|0
+Yusei Kikuchi|Los Angeles Angels|0
+Gavin Williams|Cleveland Guardians|0
+Eury Pérez|Miami Marlins|0
+Carter Jensen|Kansas City Royals|1
+Spencer Steer|Cincinnati Reds|0
+MacKenzie Gore|Texas Rangers|0
+Chris Bassitt|Baltimore Orioles|0
+Carlos Rodón|New York Yankees|0
+Max Muncy|Los Angeles Dodgers|0
+Pete Crow-Armstrong|Chicago Cubs|0
+C.J. Kayfus|Cleveland Guardians|1
+Carlos Correa|Houston Astros|0
+Kyle Stowers|Miami Marlins|0
+Miguel Vargas|Chicago White Sox|0
+Tarik Skubal|Detroit Tigers|0
+Jackson Chourio|Milwaukee Brewers|0
+Jack Dreyer|Los Angeles Dodgers|0
+Victor Scott II|St. Louis Cardinals|0
+Dylan Crews|Washington Nationals|0
+Pete Alonso|Baltimore Orioles|0
+Harry Ford|Washington Nationals|1
+Drew Rasmussen|Tampa Bay Rays|0
+Kyle Tucker|Los Angeles Dodgers|0
+Brandon Sproat|Milwaukee Brewers|1
+Sal Frelick|Milwaukee Brewers|0
+Jazz Chisholm Jr.|New York Yankees|0
+Luis Castillo|Seattle Mariners|0
+Kyle Teel|Chicago White Sox|1
+Shinnosuke Ogasawara|Washington Nationals|1
+Trevor Story|Boston Red Sox|0
+Vladimir Guerrero Jr.|Toronto Blue Jays|0
+Freddy Peralta|New York Mets|0
+Brendan Donovan|Seattle Mariners|0
+Matt McLain|Cincinnati Reds|0
+Jhostynxon Garcia|Pittsburgh Pirates|1
+Edwin Díaz|Los Angeles Dodgers|0
+Brandon Lowe|Pittsburgh Pirates|0
+Justin Crawford|Philadelphia Phillies|1
+Konnor Griffin|Pittsburgh Pirates|1
+Yoshinobu Yamamoto|Los Angeles Dodgers|0
+George Valera|Cleveland Guardians|1
+Zach Neto|Los Angeles Angels|0
+Kazuma Okamoto|Toronto Blue Jays|1
+Trent Grisham|New York Yankees|0
+Spencer Schwellenbach|Atlanta Braves|0
+Javier Báez|Detroit Tigers|0
+Iván Herrera|St. Louis Cardinals|0
+Corbin Carroll|Arizona Diamondbacks|0
+Maikel Garcia|Kansas City Royals|0
+Grant Taylor|Chicago White Sox|1
+Trey Yesavage|Toronto Blue Jays|1
+Carson Benge|New York Mets|1
+Marcelo Mayer|Boston Red Sox|0
+Tanner Bibee|Cleveland Guardians|0
+Michael McGreevy|St. Louis Cardinals|0
+Cole Ragans|Kansas City Royals|0
+Gabriel Moreno|Arizona Diamondbacks|0
+Bubba Chandler|Pittsburgh Pirates|1
+Nolan Schanuel|Los Angeles Angels|0
+Jarren Duran|Boston Red Sox|0
+Nick Pivetta|San Diego Padres|0
+Logan O'Hoppe|Los Angeles Angels|0
+Chase Meidroth|Chicago White Sox|0
+Ketel Marte|Arizona Diamondbacks|0
+Aaron Judge|New York Yankees|0
+Brandon Nimmo|Texas Rangers|0
+Alex Freeland|Los Angeles Dodgers|1
+Luke Weaver|New York Mets|0
+Taylor Walls|Tampa Bay Rays|0
+Alejandro Kirk|Toronto Blue Jays|0
+Ernie Clement|Toronto Blue Jays|0
+Zach Cole|Houston Astros|1
+Cam Smith|Houston Astros|0
+Bo Bichette|New York Mets|0
+Spencer Strider|Atlanta Braves|0
+Kevin Gausman|Toronto Blue Jays|0
+Cody Ponce|Toronto Blue Jays|1
+Max Fried|New York Yankees|0
+Shane Baz|Baltimore Orioles|0
+Owen Caissie|Miami Marlins|1
+Otto Lopez|Miami Marlins|0
+Kyle Manzardo|Cleveland Guardians|0
+Noah Cameron|Kansas City Royals|0
+JJ Wetherholt|St. Louis Cardinals|1
+Taylor Ward|Baltimore Orioles|0
+Cade Horton|Chicago Cubs|0
+Ryan Ritter|Colorado Rockies|1
+Kyle Schwarber|Philadelphia Phillies|0
+Ronald Acuña Jr.|Atlanta Braves|0
+Brenton Doyle|Colorado Rockies|0
+Drew Gilbert|San Francisco Giants|1
+José Ramírez|Cleveland Guardians|0
+James Wood|Washington Nationals|0
+Connelly Early|Boston Red Sox|1
+Junior Caminero|Tampa Bay Rays|0
+Jac Caglianone|Kansas City Royals|1
+Daylen Lile|Washington Nationals|0
+Justin Verlander|Detroit Tigers|0
+Chase Burns|Cincinnati Reds|1
+Hunter Greene|Cincinnati Reds|0
+Jackson Holliday|Baltimore Orioles|0
+Jackson Merrill|San Diego Padres|0
+Kodai Senga|New York Mets|0
+Coby Mayo|Baltimore Orioles|0
+Willy Adames|San Francisco Giants|0
+Hurston Waldrep|Atlanta Braves|0
+Carson Whisenhunt|San Francisco Giants|1
+Zach Maxwell|Cincinnati Reds|1
+Giancarlo Stanton|New York Yankees|0
+Aroldis Chapman|Boston Red Sox|0
+Randy Arozarena|Seattle Mariners|0
+Colby Thomas|Athletics|1
+Max Scherzer|Toronto Blue Jays|0
+Julio Rodríguez|Seattle Mariners|0
+Paul Skenes|Pittsburgh Pirates|0
+Royce Lewis|Minnesota Twins|0
+Chandler Simpson|Tampa Bay Rays|0
+Gunnar Henderson|Baltimore Orioles|0
+Manny Machado|San Diego Padres|0
+Xander Bogaerts|San Diego Padres|0
+Alec Burleson|St. Louis Cardinals|0
+Jeremy Peña|Houston Astros|0
+Zac Gallen|Arizona Diamondbacks|0
+Freddie Freeman|Los Angeles Dodgers|0
+Andrew Painter|Philadelphia Phillies|1
+Shota Imanaga|Chicago Cubs|0
+Vinnie Pasquantino|Kansas City Royals|0
+Bryan Reynolds|Pittsburgh Pirates|0
+Jeff McNeil|Athletics|0
+Wilyer Abreu|Boston Red Sox|0
+Lourdes Gurriel Jr.|Arizona Diamondbacks|0
+Will Banfield|Cincinnati Reds|1
+Luis Arraez|San Francisco Giants|0
+Brice Matthews|Houston Astros|1
+Steven Kwan|Cleveland Guardians|0
+Austin Riley|Atlanta Braves|0
+Michael King|San Diego Padres|0
+Byron Buxton|Minnesota Twins|0
+Jonathan Aranda|Tampa Bay Rays|0
+Jack Leiter|Texas Rangers|0
+Logan Gilbert|Seattle Mariners|0
+Payton Tolle|Boston Red Sox|1
+Mike Yastrzemski|Atlanta Braves|0
+Brooks Lee|Minnesota Twins|0
+Riley Greene|Detroit Tigers|0
+T.J. Rumfield|Colorado Rockies|1
+Nolan Arenado|Arizona Diamondbacks|0
+Rafael Devers|San Francisco Giants|0
+Parker Messick|Cleveland Guardians|1
+Rafael Flores|Pittsburgh Pirates|1
+Brent Rooker|Athletics|0
+Dansby Swanson|Chicago Cubs|0
+Jung Hoo Lee|San Francisco Giants|0
+Brady House|Washington Nationals|1
+Henry Davis|Pittsburgh Pirates|0
+Gerrit Cole|New York Yankees|0
+Nathan Church|St. Louis Cardinals|1
+Matt Chapman|San Francisco Giants|0
+Devin Williams|New York Mets|0
+Carson Williams|Tampa Bay Rays|1
+Jacob Misiorowski|Milwaukee Brewers|1
+Patrick Bailey|San Francisco Giants|0
+William Contreras|Milwaukee Brewers|0
+Roki Sasaki|Los Angeles Dodgers|0
+Mike Trout|Los Angeles Angels|0
+Josh Naylor|Seattle Mariners|0
+Troy Melton|Detroit Tigers|1
+Eugenio Suárez|Cincinnati Reds|0
+Xavier Edwards|Miami Marlins|0
+Robert Suarez|Atlanta Braves|0
+Adolis García|Philadelphia Phillies|0
+Hunter Goodman|Colorado Rockies|0
+Dylan Cease|Toronto Blue Jays|0
+Caleb Durbin|Boston Red Sox|0
+Joe Ryan|Minnesota Twins|0
+Tyler Soderstrom|Athletics|0
+Sean Murphy|Atlanta Braves|0
+Wyatt Langford|Texas Rangers|0
+Andrew McCutchen|Texas Rangers|0
+Shane Smith|Chicago White Sox|0
+George Kirby|Seattle Mariners|0
+Masyn Winn|St. Louis Cardinals|0
+Dylan Beavers|Baltimore Orioles|1
+Harrison Bader|San Francisco Giants|0
+Luke Keaschall|Minnesota Twins|0
+Jordan Walker|St. Louis Cardinals|0
+Agustín Ramírez|Miami Marlins|0
+Lawrence Butler|Athletics|0
+Daulton Varsho|Toronto Blue Jays|0
+Roman Anthony|Boston Red Sox|1
+Jordan Beck|Colorado Rockies|0
+Jacob Wilson|Athletics|0
+Geraldo Perdomo|Arizona Diamondbacks|0
+Otto Kemp|Philadelphia Phillies|1
+Kerry Carpenter|Detroit Tigers|0
+Seth Lugo|Kansas City Royals|0
+Christian Moore|Los Angeles Angels|1
+J.T. Realmuto|Philadelphia Phillies|0
+Ryan Jeffers|Minnesota Twins|0
+Jo Adell|Los Angeles Angels|0
+Nolan McLean|New York Mets|1
+Corbin Burnes|Arizona Diamondbacks|0
+Logan Webb|San Francisco Giants|0
+Maximo Acosta|Miami Marlins|1
+Will Smith|Los Angeles Dodgers|0
+Matt Olson|Atlanta Braves|0
+Tatsuya Imai|Houston Astros|1
+CJ Abrams|Washington Nationals|0
+Bryce Harper|Philadelphia Phillies|0
+Jacob Melton|Tampa Bay Rays|1
+Denzel Clarke|Athletics|0
+Warming Bernabel|Washington Nationals|1
+Bryson Stott|Philadelphia Phillies|0
+Oneil Cruz|Pittsburgh Pirates|0
+Nick Kurtz|Athletics|0
+Isaac Collins|Kansas City Royals|0
+Christian Walker|Houston Astros|0
+George Springer|Toronto Blue Jays|0
+Bryce Eldridge|San Francisco Giants|1
+Cody Freeman|Texas Rangers|1
+Matthew Boyd|Chicago Cubs|0
+Denzer Guzman|Los Angeles Angels|1
+Drake Baldwin|Atlanta Braves|0
+Colson Montgomery|Chicago White Sox|1
+Fernando Tatis Jr.|San Diego Padres|0
+Jakob Marsee|Miami Marlins|1
+Cam Schlittler|New York Yankees|1
+Brett Baty|New York Mets|0
+Moisés Ballesteros|Chicago Cubs|0
+Jesús Luzardo|Philadelphia Phillies|0
+Jacob deGrom|Texas Rangers|0
+Luis Robert Jr.|New York Mets|0
+Mookie Betts|Los Angeles Dodgers|0
+Jonah Tong|New York Mets|1
+Cristopher Sánchez|Philadelphia Phillies|0
+Matt Shaw|Chicago Cubs|0
+Daniel Schneemann|Cleveland Guardians|0
+Shea Langeliers|Athletics|0
+Munetaka Murakami|Chicago White Sox|1
+Paul Goldschmidt|New York Yankees|0
+Addison Barger|Toronto Blue Jays|0
+Chase Dollander|Colorado Rockies|0
+Blake Snell|Los Angeles Dodgers|0
+Elly De La Cruz|Cincinnati Reds|0
+Willson Contreras|Boston Red Sox|0
+Marcus Semien|New York Mets|0
+Kristian Campbell|Boston Red Sox|0
+Salvador Perez|Kansas City Royals|0
+Chase DeLauter|Cleveland Guardians|1
+Hunter Brown|Houston Astros|0
+Andrés Giménez|Toronto Blue Jays|0
+Mason Miller|San Diego Padres|0
+Kris Bryant|Colorado Rockies|0
+Spencer Torkelson|Detroit Tigers|0
+Zack Wheeler|Philadelphia Phillies|0
+Jimmy Crooks|St. Louis Cardinals|1
+Lars Nootbaar|St. Louis Cardinals|0
+Austin Hays|Chicago White Sox|0
+Luis Morales|Athletics|1
+Ben Rice|New York Yankees|0
+Chris Sale|Atlanta Braves|0
+Ozzie Albies|Atlanta Braves|0
+Adley Rutschman|Baltimore Orioles|0
+Francisco Lindor|New York Mets|0
+Garrett Crochet|Boston Red Sox|0
+`;
+
+const POOL_1991INSERT_RAW = `
+Shohei Ohtani|Los Angeles Dodgers
+Aaron Judge|New York Yankees
+Bryce Harper|Philadelphia Phillies
+Cal Raleigh|Seattle Mariners
+Ronald Acuña Jr.|Atlanta Braves
+Mike Trout|Los Angeles Angels
+Elly De La Cruz|Cincinnati Reds
+Mookie Betts|Los Angeles Dodgers
+José Ramírez|Cleveland Guardians
+Yoshinobu Yamamoto|Los Angeles Dodgers
+Juan Soto|New York Mets
+Fernando Tatis Jr.|San Diego Padres
+Julio Rodríguez|Seattle Mariners
+Pete Crow-Armstrong|Chicago Cubs
+Paul Skenes|Pittsburgh Pirates
+Colson Montgomery|Chicago White Sox
+Samuel Basallo|Baltimore Orioles
+Bubba Chandler|Pittsburgh Pirates
+Roman Anthony|Boston Red Sox
+Jac Caglianone|Kansas City Royals
+Sal Stewart|Cincinnati Reds
+Munetaka Murakami|Chicago White Sox
+Tatsuya Imai|Houston Astros
+Kazuma Okamoto|Toronto Blue Jays
+Chase Burns|Cincinnati Reds
+Christian Moore|Los Angeles Angels
+Owen Caissie|Miami Marlins
+Jakob Marsee|Miami Marlins
+Kyle Teel|Chicago White Sox
+Bryce Eldridge|San Francisco Giants
+`;
+
+const POOL_ROOKIEAUTO_RAW = `
+Andrew Alvarez|Washington Nationals
+Alex Freeland|Los Angeles Dodgers
+Andrew Morris|Minnesota Twins
+Andrew Painter|Philadelphia Phillies
+Anthony Seigler|Milwaukee Brewers
+Bubba Chandler|Pittsburgh Pirates
+Bryce Eldridge|San Francisco Giants
+Brady House|Washington Nationals
+Bradgley Rodriguez|San Diego Padres
+Bob Seymour|Tampa Bay Rays
+Brandon Sproat|New York Mets
+Chase Burns|Cincinnati Reds
+Carlos Cortes|Athletics
+Chase DeLauter|Cleveland Guardians
+Cam Devanney|Pittsburgh Pirates
+Connelly Early|Boston Red Sox
+Cody Freeman|Texas Rangers
+Carter Jensen|Kansas City Royals
+C.J. Kayfus|Cleveland Guardians
+Colson Montgomery|Chicago White Sox
+Christian Moore|Los Angeles Angels
+César Prieto|St. Louis Cardinals
+Carson Seymour|San Francisco Giants
+Cam Schlittler|New York Yankees
+Chad Stevens|Los Angeles Angels
+Colby Thomas|Athletics
+Carson Whisenhunt|San Francisco Giants
+Carson Williams|Tampa Bay Rays
+Cole Young|Seattle Mariners
+Dylan Beavers|Baltimore Orioles
+Didier Fuentes|Atlanta Braves
+Denzer Guzman|Los Angeles Angels
+Dom Hamel|Texas Rangers
+Dylan Smith|Detroit Tigers
+Eduarniel Núñez|Athletics
+Grant Taylor|Chicago White Sox
+Hunter Barco|Pittsburgh Pirates
+Harry Ford|Seattle Mariners
+Hayden Harris|Atlanta Braves
+Heriberto Hernández|Miami Marlins
+Tatsuya Imai|Houston Astros
+Jac Caglianone|Kansas City Royals
+Jose Corniell|Texas Rangers
+Jimmy Crooks|St. Louis Cardinals
+Justin Dean|Los Angeles Dodgers
+Jhostynxon Garcia|Boston Red Sox
+Jeremiah Jackson|Baltimore Orioles
+JJ Wetherholt|St. Louis Cardinals
+Jacob Misiorowski|Milwaukee Brewers
+Jakob Marsee|Miami Marlins
+Jacob Melton|Houston Astros
+Jack Perkins|Athletics
+Jonah Tong|New York Mets
+Jack Winkler|Miami Marlins
+Kenedy Corona|Houston Astros
+Konnor Griffin|Pittsburgh Pirates
+Kyle Karros|Colorado Rockies
+Kevin McGonigle|Detroit Tigers
+Kyle Teel|Chicago White Sox
+Luis Curvelo|Texas Rangers
+Luis Morales|Athletics
+Maximo Acosta|Miami Marlins
+Mason Barnett|Athletics
+Munetaka Murakami|Chicago White Sox
+Nathan Church|St. Louis Cardinals
+Nolan McLean|New York Mets
+Noah Schultz|Chicago White Sox
+Owen Caissie|Chicago Cubs
+Otto Kemp|Philadelphia Phillies
+Kazuma Okamoto|Toronto Blue Jays
+Paul Gervase|Los Angeles Dodgers
+Petey Halpin|Cleveland Guardians
+Parker Messick|Cleveland Guardians
+Payton Tolle|Boston Red Sox
+Roman Anthony|Boston Red Sox
+Rafael Flores|Pittsburgh Pirates
+Rolddy Muñoz|Atlanta Braves
+Ryan Ritter|Colorado Rockies
+Samuel Basallo|Baltimore Orioles
+Shinnosuke Ogasawara|Washington Nationals
+Sal Stewart|Cincinnati Reds
+CJ Stubbs|Washington Nationals
+Tristin English|Arizona Diamondbacks
+Troy Johnston|Miami Marlins
+Troy Melton|Detroit Tigers
+Tristan Peters|Tampa Bay Rays
+Trey Yesavage|Toronto Blue Jays
+Will Banfield|Cincinnati Reds
+Warming Bernabel|Colorado Rockies
+Wikelman González|Chicago White Sox
+Will Robertson|Pittsburgh Pirates
+Yanquiel Fernández|Colorado Rockies
+Zach Cole|Houston Astros
+Zach Maxwell|Cincinnati Reds
+`;
+
+const POOL_INKSTROKES_RAW = `
+Alec Bohm|Philadelphia Phillies
+Andre Dawson|Montréal Expos
+Addison Barger|Toronto Blue Jays
+Andrés Giménez|Toronto Blue Jays
+Alejandro Kirk|Toronto Blue Jays
+Alec Burleson|St. Louis Cardinals
+Andy Pettitte|Houston Astros
+Agustín Ramírez|Miami Marlins
+Alan Trammell|Detroit Tigers
+Anthony Volpe|New York Yankees
+Moisés Ballesteros|Chicago Cubs
+Byron Buxton|Minnesota Twins
+Brent Rooker|Athletics
+Brice Turang|Milwaukee Brewers
+Bryan Woo|Seattle Mariners
+CJ Abrams|Washington Nationals
+Corbin Carroll|Arizona Diamondbacks
+Caleb Durbin|Milwaukee Brewers
+Cade Horton|Chicago Cubs
+Chase Dollander|Colorado Rockies
+Coby Mayo|Baltimore Orioles
+Carlos Narváez|Boston Red Sox
+Chandler Simpson|Tampa Bay Rays
+Christian Yelich|Milwaukee Brewers
+Drake Baldwin|Atlanta Braves
+Dillon Dingler|Detroit Tigers
+Daylen Lile|Washington Nationals
+Brendan Donovan|St. Louis Cardinals
+Evan Carter|Texas Rangers
+Edgar Quero|Chicago White Sox
+George Kirby|Seattle Mariners
+George Springer|Toronto Blue Jays
+Hyeseong Kim|Los Angeles Dodgers
+Jonathan Aranda|Tampa Bay Rays
+Jackson Chourio|Milwaukee Brewers
+Jasson Domínguez|New York Yankees
+Jason Giambi|Athletics
+Jung Hoo Lee|San Francisco Giants
+Josh Jung|Texas Rangers
+Johan Santana|Minnesota Twins
+John Smoltz|Atlanta Braves
+Kerry Carpenter|Detroit Tigers
+Luisangel Acuña|New York Mets
+Luis Gil|New York Yankees
+Logan Henderson|Milwaukee Brewers
+Lou Piniella|New York Yankees
+Larry Walker|Montréal Expos
+Mick Abel|Minnesota Twins
+Jake Mangum|Tampa Bay Rays
+Max Fried|New York Yankees
+Michael Harris II|Atlanta Braves
+Marcelo Mayer|Boston Red Sox
+Michael McGreevy|St. Louis Cardinals
+Mason Miller|San Diego Padres
+Marcell Ozuna|Atlanta Braves
+Matt Shaw|Chicago Cubs
+Masyn Winn|St. Louis Cardinals
+Noah Cameron|Kansas City Royals
+Nick Kurtz|Athletics
+Robert Hassell III|Washington Nationals
+Rhett Lowder|Cincinnati Reds
+Adley Rutschman|Baltimore Orioles
+Shane Bieber|Toronto Blue Jays
+Shane Smith|Chicago White Sox
+Shota Imanaga|Chicago Cubs
+Steven Kwan|Cleveland Guardians
+Spencer Schwellenbach|Atlanta Braves
+Tom Glavine|Atlanta Braves
+Tyler Soderstrom|Athletics
+William Contreras|Milwaukee Brewers
+Wyatt Langford|Texas Rangers
+`;
+
+const POOL_75THDIAMOND_RAW = `
+Alex Bregman|Boston Red Sox
+Adrían González|Los Angeles Dodgers
+Alejandro Kirk|Toronto Blue Jays
+Alec Bohm|Philadelphia Phillies
+Andrew McCutchen|Pittsburgh Pirates
+Austin Riley|Atlanta Braves
+Adley Rutschman|Baltimore Orioles
+Alfonso Soriano|Chicago Cubs
+Anthony Volpe|New York Yankees
+Moisés Ballesteros|Chicago Cubs
+Bert Blyleven|Minnesota Twins
+Bryan Reynolds|Pittsburgh Pirates
+Brice Turang|Milwaukee Brewers
+Carlton Fisk|Boston Red Sox
+Chris Sale|Atlanta Braves
+Johnny Damon|Boston Red Sox
+Dusty Baker|Los Angeles Dodgers
+Dale Murphy|Atlanta Braves
+Jasson Domínguez|New York Yankees
+Darryl Strawberry|New York Mets
+David Wright|New York Mets
+Elly De La Cruz|Cincinnati Reds
+Eddie Murray|Baltimore Orioles
+Edgar Martinez|Seattle Mariners
+Edgar Quero|Chicago White Sox
+Ezequiel Tovar|Colorado Rockies
+Félix Hernández|Seattle Mariners
+Freddy Peralta|Milwaukee Brewers
+Frank Thomas|Chicago White Sox
+Fernando Tatis Jr.|San Diego Padres
+Gary Sheffield|Florida Marlins
+Hurston Waldrep|Atlanta Braves
+Ian Happ|Chicago Cubs
+Isaac Paredes|Houston Astros
+Johnny Bench|Cincinnati Reds
+Jarren Duran|Boston Red Sox
+Jimmy Rollins|Philadelphia Phillies
+Jackson Jobe|Detroit Tigers
+Jim Rice|Boston Red Sox
+Johan Santana|Minnesota Twins
+J.T. Realmuto|Philadelphia Phillies
+Joey Votto|Cincinnati Reds
+James Wood|Washington Nationals
+Kristian Campbell|Boston Red Sox
+Kyle Manzardo|Cleveland Guardians
+Kyle Schwarber|Philadelphia Phillies
+Kerry Wood|Chicago Cubs
+Luis Castillo|Seattle Mariners
+Logan Webb|San Francisco Giants
+Michael Busch|Chicago Cubs
+Matt Chapman|San Francisco Giants
+Michael McGreevy|St. Louis Cardinals
+Matt Olson|Atlanta Braves
+Mike Schmidt|Philadelphia Phillies
+Nico Hoerner|Chicago Cubs
+Ozzie Smith|St. Louis Cardinals
+Marcell Ozuna|Atlanta Braves
+Paul Goldschmidt|New York Yankees
+José Ramírez|Cleveland Guardians
+José Reyes|New York Mets
+Rollie Fingers|Oakland Athletics
+Riley Greene|Detroit Tigers
+Ryan Howard|Philadelphia Phillies
+Ryan McMahon|New York Yankees
+Roki Sasaki|Los Angeles Dodgers
+Tommy Edman|Los Angeles Dodgers
+Tyler Soderstrom|Athletics
+Willie McGee|St. Louis Cardinals
+Yoshinobu Yamamoto|Los Angeles Dodgers
+`;
+
+const POOL_CHROMOGRAPHS_RAW = `
+Adrian Beltré|Texas Rangers
+Alex Freeland|Los Angeles Dodgers
+Bubba Chandler|Pittsburgh Pirates
+Buster Posey|San Francisco Giants
+Chase Burns|Cincinnati Reds
+Chipper Jones|Atlanta Braves
+Colson Montgomery|Chicago White Sox
+Cal Ripken Jr.|Baltimore Orioles
+Carson Williams|Tampa Bay Rays
+Derek Jeter|New York Yankees
+Don Mattingly|New York Yankees
+David Ortiz|Boston Red Sox
+Freddie Freeman|Los Angeles Dodgers
+George Brett|Kansas City Royals
+Hideki Matsui|New York Yankees
+Ichiro|Seattle Mariners
+Jac Caglianone|Kansas City Royals
+Jacob Misiorowski|Milwaukee Brewers
+Kirk Gibson|Los Angeles Dodgers
+Ken Griffey Jr.|Seattle Mariners
+Kyle Teel|Chicago White Sox
+Miguel Cabrera|Detroit Tigers
+Manny Machado|San Diego Padres
+Mark McGwire|St. Louis Cardinals
+Mike Trout|Los Angeles Angels
+Owen Caissie|Chicago Cubs
+Orel Hershiser|Los Angeles Dodgers
+Ronald Acuña Jr.|Atlanta Braves
+Reggie Jackson|Oakland Athletics
+Robin Yount|Milwaukee Brewers
+Sammy Sosa|Chicago Cubs
+Yoshinobu Yamamoto|Los Angeles Dodgers
+`;
+
+const POOL_WSCHAMPIONS_RAW = `
+Alex Gordon|Kansas City Royals
+Andy Pettitte|New York Yankees
+Anthony Rizzo|Chicago Cubs
+Bert Blyleven|Pittsburgh Pirates
+Buster Posey|San Francisco Giants
+Bret Saberhagen|Kansas City Royals
+Bernie Williams|New York Yankees
+Cody Bellinger|Los Angeles Dodgers
+Chipper Jones|Atlanta Braves
+Cal Ripken Jr.|Baltimore Orioles
+Chris Sale|Boston Red Sox
+David Freese|St. Louis Cardinals
+Derek Jeter|New York Yankees
+Dustin Pedroia|Boston Red Sox
+Darryl Strawberry|New York Mets
+George Foster|Cincinnati Reds
+Greg Maddux|Atlanta Braves
+Hunter Pence|San Francisco Giants
+Ivan Rodriguez|Florida Marlins
+Jose Altuve|Houston Astros
+Keith Hernandez|New York Mets
+Mark Buehrle|Chicago White Sox
+Miguel Cabrera|Florida Marlins
+Mark Grace|Arizona Diamondbacks
+Mariano Rivera|New York Yankees
+Orlando Hernandez|Chicago White Sox
+Ozzie Smith|St. Louis Cardinals
+Pedro Martinez|Boston Red Sox
+Paul O'Neill|New York Yankees
+Roger Clemens|New York Yankees
+Steve Carlton|St. Louis Cardinals
+Tim Salmon|Los Angeles Angels
+Trea Turner|Washington Nationals
+`;
+
+const POOL_FUTURESTARS_RAW = `
+Cade Horton|Chicago Cubs
+Chandler Simpson|Tampa Bay Rays
+Drake Baldwin|Atlanta Braves
+Jacob Wilson|Athletics
+Kristian Campbell|Boston Red Sox
+Marcelo Mayer|Boston Red Sox
+Matt Shaw|Chicago Cubs
+Nick Kurtz|Athletics
+`;
+
+const POOL_PERSPECTIVES_RAW = `
+Albert Pujols|St. Louis Cardinals
+Christian Moore|Los Angeles Angels
+Jac Caglianone|Kansas City Royals
+Mike Trout|Los Angeles Angels
+Nick Kurtz|Athletics
+Paul Skenes|Pittsburgh Pirates
+`;
+
+const POOL_RADIATINGROOKIES_RAW = `
+Alex Freeland|Los Angeles Dodgers
+Chase Burns|Cincinnati Reds
+Chase DeLauter|Cleveland Guardians
+Colson Montgomery|Chicago White Sox
+Christian Moore|Los Angeles Angels
+Cole Young|Seattle Mariners
+Dylan Beavers|Baltimore Orioles
+Jac Caglianone|Kansas City Royals
+Jakob Marsee|Miami Marlins
+Jacob Melton|Houston Astros
+Jacob Misiorowski|Milwaukee Brewers
+Jonah Tong|New York Mets
+Payton Tolle|Boston Red Sox
+Samuel Basallo|Baltimore Orioles
+Sal Stewart|Cincinnati Reds
+`;
+
+const POOL_NUMBERSLIVEFOREVER_RAW = `
+Billy Williams|Chicago Cubs
+Wade Boggs|Boston Red Sox
+`;
+
+const POOL_1991AUTO_RAW = `
+Corbin Carroll|Arizona Diamondbacks
+Colson Montgomery|Chicago White Sox
+Carson Williams|Tampa Bay Rays
+Jac Caglianone|Kansas City Royals
+Owen Caissie|Chicago Cubs
+Samuel Basallo|Baltimore Orioles
+`;
+
+const POOL_COOPERSTOWN_RAW = `
+Andruw Jones|Atlanta Braves
+Carlos Beltrán|New York Mets
+Jeff Kent|San Francisco Giants
+`;
+
+const POOL_SEINFELD_RAW = `
+Jerry Seinfeld|New York Mets
+`;
+
+const POOL_GOLDLOGOMAN_RELIC_RAW = `
+Aaron Judge|New York Yankees
+Drake Baldwin|Atlanta Braves
+Nick Kurtz|Athletics
+Paul Skenes|Pittsburgh Pirates
+Shohei Ohtani|Los Angeles Dodgers
+Tarik Skubal|Detroit Tigers
+`;
+
+const POOL_GOLDLOGOMAN_AUTORELIC_RAW = `
+Aaron Judge|New York Yankees
+Drake Baldwin|Atlanta Braves
+Nick Kurtz|Athletics
+Paul Skenes|Pittsburgh Pirates
+Shohei Ohtani|Los Angeles Dodgers
+Tarik Skubal|Detroit Tigers
+`;
+
+const POOL_DUALAUTO_RAW = `
+Bobby Witt Jr.|Kansas City Royals|Jac Caglianone|Kansas City Royals
+Elly De La Cruz|Cincinnati Reds|Ken Griffey Jr.|Cincinnati Reds
+Kirk Gibson|Detroit Tigers|Tarik Skubal|Detroit Tigers
+Ichiro|Seattle Mariners|Sadaharu Oh|
+Reggie Jackson|New York Yankees|Derek Jeter|New York Yankees
+Mark McGwire|Athletics|Nick Kurtz|Athletics
+David Ortiz|Boston Red Sox|Manny Ramirez|Boston Red Sox
+Sammy Sosa|Chicago Cubs|Andre Dawson|Chicago Cubs
+`;
+
+const POOL_GOLDLOGOMAN_DUALRELIC_RAW = `
+Nick Kurtz|Athletics|Drake Baldwin|Atlanta Braves
+Aaron Judge|New York Yankees|Shohei Ohtani|Los Angeles Dodgers
+Tarik Skubal|Detroit Tigers|Paul Skenes|Pittsburgh Pirates
+`;
+
+const POOL_GOLDLOGOMAN_DUALAUTORELIC_RAW = `
+Nick Kurtz|Athletics|Drake Baldwin|Atlanta Braves
+Aaron Judge|New York Yankees|Shohei Ohtani|Los Angeles Dodgers
+Tarik Skubal|Detroit Tigers|Paul Skenes|Pittsburgh Pirates
+`;
+
+
+function parseChecklist(raw){
+  return raw.trim().split('\n').map(line=>{
+    const parts = line.split('|');
+    const name = parts[0], teamName = parts[1], rc = parts[2];
+    return {name, team: TEAM_NAME_TO_ABBR[(teamName||'').trim()] || null, rc: rc==='1'};
+  });
+}
+function parsePoolSimple(raw){
+  return raw.trim().split('\n').map(line=>{
+    const parts = line.split('|');
+    const name = parts[0], teamName = parts[1];
+    return {name, team: TEAM_NAME_TO_ABBR[(teamName||'').trim()] || null};
+  });
+}
+function parsePoolDual(raw){
+  return raw.trim().split('\n').map(line=>{
+    const parts = line.split('|');
+    return {
+      names:[parts[0], parts[2]],
+      teams:[TEAM_NAME_TO_ABBR[(parts[1]||'').trim()]||null, TEAM_NAME_TO_ABBR[(parts[3]||'').trim()]||null]
+    };
+  });
+}
+
+const BASE_CHECKLIST = parseChecklist(BASE_CHECKLIST_RAW); // 300 real cards
+
+// ============ Real official JUMBO BASE card parallel odds (1:X packs) ============
+// Prism Refractor is Hobby-exclusive and does not appear in Jumbo product — omitted.
+const PARALLEL_POOL = [
+  {name:"Refractor", odds:1, printRun:null, bucket:'refractor'},
+  {name:"Negative Refractor", odds:63, printRun:null, bucket:'refractor'},
+  {name:"Pink Refractor", odds:102, printRun:250, bucket:'numbered'},
+  {name:"Aqua Refractor", odds:127, printRun:199, bucket:'numbered'},
+  {name:"Blue Refractor", odds:168, printRun:150, bucket:'numbered'},
+  {name:"Green Refractor", odds:256, printRun:99, bucket:'numbered'},
+  {name:"75th Anniversary Refractor", odds:337, printRun:75, bucket:'numbered'},
+  {name:"Purple Refractor", odds:337, printRun:75, bucket:'numbered'},
+  {name:"Gold Refractor", odds:506, printRun:50, bucket:'numbered'},
+  {name:"White Refractor", odds:842, printRun:30, bucket:'numbered'},
+  {name:"Orange Refractor", odds:1011, printRun:25, bucket:'numbered'},
+  {name:"Black Refractor", odds:2518, printRun:10, bucket:'case_hit'},
+  {name:"Red Refractor", odds:5035, printRun:5, bucket:'case_hit'},
+  {name:"FrozenFractor", odds:927, printRun:null, bucket:'case_hit'},
+  {name:"SuperFractor", odds:24256, printRun:1, bucket:'case_hit'},
+  {name:"Printing Plates", odds:6353, printRun:1, bucket:'case_hit'},
+];
+
+// ============ Real official JUMBO INSERT / AUTOGRAPH sets — each with its own full parallel tier list ============
+// Every tier below is its own independent per-pack roll at the exact official Jumbo odds (1:X).
+// "parallel:null" = the plain/unnumbered base version of that set (still that set's own cardType).
+// bucket: which display bucket the tier belongs in. Numbered tiers rarer than /25 fold into 'case_hit'
+// to match the "Refractor / Numbered / Insert / Auto / Case Hit" UI grouping already in place.
+function tier(parallel, odds, printRun, bucket){ return {parallel, odds, printRun, bucket}; }
+
+const INSERT_SETS = [
+  {
+    key:'insert1991', label:"1991 Topps Baseball", isAuto:false, cards:parsePoolSimple(POOL_1991INSERT_RAW),
+    tiers:[
+      tier(null, 4, null, 'insert'),
+      tier("Green Refractor", 2550, 99, 'insert'),
+      tier("Purple Refractor", 3364, 75, 'insert'),
+      tier("Gold Refractor", 5067, 50, 'insert'),
+      tier("Orange Refractor", 10133, 25, 'case_hit'),
+      tier("Black Refractor", 25014, 10, 'case_hit'),
+      tier("Red Refractor", 50028, 5, 'case_hit'),
+      tier("SuperFractor", 266816, 1, 'case_hit'),
+    ]
+  },
+];
+
+const AUTO_SETS = [
+  {
+    key:'rookieAuto', label:"Chrome Rookie Autographs", isAuto:true, isRC:true, cards:parsePoolSimple(POOL_ROOKIEAUTO_RAW),
+    tiers:[
+      tier(null, 14, null, 'auto'),
+      tier("Refractor", 59, 499, 'auto'),
+      tier("Teal Refractor", 92, 299, 'auto'),
+      tier("Yellow Refractor", 100, 275, 'auto'),
+      tier("Pink Refractor", 109, 250, 'auto'),
+      tier("Aqua Refractor", 136, 199, 'auto'),
+      tier("Blue Refractor", 176, 150, 'auto'),
+      tier("Green Refractor", 271, 99, 'auto'),
+      tier("Purple Refractor", 347, 75, 'auto'),
+      tier("Gold Refractor", 505, 50, 'case_hit'),
+      tier("White Refractor", 859, 30, 'case_hit'),
+      tier("Orange Refractor", 1015, 25, 'case_hit'),
+      tier("Black Refractor", 2314, 10, 'case_hit'),
+      tier("Red Refractor", 4536, 5, 'case_hit'),
+      tier("SuperFractor", 23181, 1, 'case_hit'),
+      tier("Printing Plates", 5716, 1, 'case_hit'),
+    ]
+  },
+  {
+    key:'inkStrokes', label:"Ink Strokes", isAuto:true, cards:parsePoolSimple(POOL_INKSTROKES_RAW),
+    tiers:[
+      tier(null, 153, null, 'auto'),
+      tier("Blue Refractor", 275, 150, 'auto'),
+      tier("Green Refractor", 390, 99, 'auto'),
+      tier("Gold Refractor", 716, 50, 'case_hit'),
+      tier("Orange Refractor", 1430, 25, 'case_hit'),
+      tier("Black Refractor", 3558, 10, 'case_hit'),
+      tier("Red Refractor", 7084, 5, 'case_hit'),
+      tier("SuperFractor", 34803, 1, 'case_hit'),
+      tier("Printing Plates", 8894, 1, 'case_hit'),
+    ]
+  },
+  {
+    key:'diamond75', label:"75th Diamond Autographs", isAuto:true, cards:parsePoolSimple(POOL_75THDIAMOND_RAW),
+    tiers:[
+      tier(null, 294, null, 'auto'),
+      tier("Blue Refractor", 446, 150, 'auto'),
+      tier("Green Refractor", 460, 99, 'auto'),
+      tier("Gold Refractor", 812, 50, 'case_hit'),
+      tier("Orange Refractor", 1480, 25, 'case_hit'),
+      tier("Black Refractor", 3672, 10, 'case_hit'),
+      tier("Red Refractor", 7344, 5, 'case_hit'),
+      tier("SuperFractor", 36384, 1, 'case_hit'),
+      tier("Printing Plates", 9308, 1, 'case_hit'),
+    ]
+  },
+  {
+    key:'chromographs', label:"Chromographs", isAuto:true, cards:parsePoolSimple(POOL_CHROMOGRAPHS_RAW),
+    tiers:[
+      tier(null, 1682, null, 'auto'),
+      tier("Orange Refractor", 2943, 25, 'case_hit'),
+      tier("Black Refractor", 7344, 10, 'case_hit'),
+      tier("Red Refractor", 14554, 5, 'case_hit'),
+      tier("SuperFractor", 72768, 1, 'case_hit'),
+    ]
+  },
+  {
+    key:'wsChampions', label:"World Series Champions Autographs", isAuto:true, cards:parsePoolSimple(POOL_WSCHAMPIONS_RAW),
+    tiers:[
+      tier(null, 1304, null, 'auto'),
+      tier("SuperFractor", 133408, 1, 'case_hit'),
+    ]
+  },
+  {
+    key:'futureStars', label:"Future Stars Autographs", isAuto:true, cards:parsePoolSimple(POOL_FUTURESTARS_RAW),
+    tiers:[
+      tier(null, 3056, null, 'auto'),
+      tier("Gold Refractor", 5930, 50, 'case_hit'),
+      tier("Orange Refractor", 11772, 25, 'case_hit'),
+      tier("Black Refractor", 29647, 10, 'case_hit'),
+      tier("Red Refractor", 57175, 5, 'case_hit'),
+      tier("SuperFractor", 266816, 1, 'case_hit'),
+    ]
+  },
+  {
+    key:'perspectives', label:"Perspectives Autographs", isAuto:true, cards:parsePoolSimple(POOL_PERSPECTIVES_RAW),
+    tiers:[
+      tier(null, 5559, null, 'case_hit'),
+      tier("Gold Refractor", 16009, 50, 'case_hit'),
+      tier("Orange Refractor", 15696, 25, 'case_hit'),
+      tier("Black Refractor", 38117, 10, 'case_hit'),
+      tier("Red Refractor", 80045, 5, 'case_hit'),
+      tier("SuperFractor", 400224, 1, 'case_hit'),
+    ]
+  },
+  {
+    key:'radiatingRookies', label:"Radiating Rookies Autographs", isAuto:true, cards:parsePoolSimple(POOL_RADIATINGROOKIES_RAW),
+    tiers:[
+      tier(null, 5559, null, 'case_hit'),
+      tier("SuperFractor", 133408, 1, 'case_hit'),
+    ]
+  },
+  {
+    key:'auto1991', label:"1991 Topps Autographs", isAuto:true, cards:parsePoolSimple(POOL_1991AUTO_RAW),
+    tiers:[
+      tier(null, 9530, null, 'case_hit'),
+      tier("Gold Refractor", 9883, 50, 'case_hit'),
+      tier("Orange Refractor", 18616, 25, 'case_hit'),
+      tier("Black Refractor", 47086, 10, 'case_hit'),
+      tier("Red Refractor", 100056, 5, 'case_hit'),
+      tier("SuperFractor", 400224, 1, 'case_hit'),
+    ]
+  },
+  {
+    key:'cooperstown', label:"Cooperstown Calls Autographs", isAuto:true, cards:parsePoolSimple(POOL_COOPERSTOWN_RAW),
+    tiers:[
+      tier(null, 30787, null, 'case_hit'),
+      tier("Black Refractor", 80045, 10, 'case_hit'),
+      tier("Red Refractor", 160090, 5, 'case_hit'),
+      tier("SuperFractor", 800448, 1, 'case_hit'),
+    ]
+  },
+  {
+    key:'seinfeld', label:"Topps Chrome Autographs", isAuto:true, cards:parsePoolSimple(POOL_SEINFELD_RAW),
+    tiers:[
+      tier(null, 100056, null, 'case_hit'),
+      tier("Black Refractor", 200112, 10, 'case_hit'),
+      tier("Red Refractor", 400224, 5, 'case_hit'),
+      // no official Jumbo SuperFractor odds published for this set — omitted rather than guessed
+    ]
+  },
+  {
+    key:'numbersLiveForever', label:"Numbers Live Forever Autographs", isAuto:true, cards:parsePoolSimple(POOL_NUMBERSLIVEFOREVER_RAW),
+    tiers:[
+      tier(null, 24256, null, 'case_hit'),
+      tier("Orange Refractor", 53364, 25, 'case_hit'),
+      tier("Black Refractor", 133408, 10, 'case_hit'),
+      tier("Red Refractor", 200112, 5, 'case_hit'),
+      tier("SuperFractor", 800448, 1, 'case_hit'),
+    ]
+  },
+  {
+    key:'dualAuto', label:"Dual Autographs", isAuto:true, dual:true, cards:parsePoolDual(POOL_DUALAUTO_RAW),
+    tiers:[
+      tier(null, 15103, null, 'case_hit'),
+      tier("Black Refractor", 32018, 10, 'case_hit'),
+      tier("Red Refractor", 57175, 5, 'case_hit'),
+      tier("SuperFractor", 266816, 1, 'case_hit'),
+    ]
+  },
+  {
+    key:'logomanRelic', label:"Gold Logoman Relic", isAuto:false, cards:parsePoolSimple(POOL_GOLDLOGOMAN_RELIC_RAW),
+    tiers:[ tier(null, 100056, null, 'case_hit') ]
+  },
+  {
+    key:'logomanAutoRelic', label:"Gold Logoman Autograph Relic", isAuto:true, oneOfOne:true, cards:parsePoolSimple(POOL_GOLDLOGOMAN_AUTORELIC_RAW),
+    tiers:[ tier(null, 400224, 1, 'case_hit') ]
+  },
+  {
+    key:'logomanDualRelic', label:"Gold Logoman Dual Relic", isAuto:false, dual:true, cards:parsePoolDual(POOL_GOLDLOGOMAN_DUALRELIC_RAW),
+    tiers:[ tier(null, 200112, null, 'case_hit') ]
+  },
+  {
+    key:'logomanDualAutoRelic', label:"Gold Logoman Dual Autograph Relic", isAuto:true, oneOfOne:true, dual:true, cards:parsePoolDual(POOL_GOLDLOGOMAN_DUALAUTORELIC_RAW),
+    tiers:[ tier(null, 800448, 1, 'case_hit') ]
+  },
+];
+
+const BUCKET_ORDER = ['refractor','numbered','insert','auto','case_hit'];
+const BUCKET_LABELS = {refractor:'Refractor', numbered:'Numbered', insert:'Insert', auto:'Auto', case_hit:'Case Hit / 其他特殊卡'};
+
+
+const YEAR = 2026;
+const SET_NAME = "Topps Chrome";
+// ============================================================================
+// USED_SERIALS — enforces that any numbered (/X or 1/1) card is unique within
+// the same life. Once a specific serial number has been produced, it can
+// never be produced again; once every serial in a print run has been
+// produced, that exact variant can no longer occur at all. Persisted so it
+// survives page reloads; only "重新開始人生" clears it.
+// ============================================================================
+const USED_SERIALS_KEY = 'teamBreakUsedSerialsV1';
+function loadUsedSerials(){
+  try{
+    const raw = localStorage.getItem(USED_SERIALS_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){}
+  return {};
+}
+function saveUsedSerials(){
+  try{ localStorage.setItem(USED_SERIALS_KEY, JSON.stringify(USED_SERIALS)); }catch(e){}
+}
+let USED_SERIALS = loadUsedSerials(); // key: "year|set|player|cardType|parallel|printRun" -> array of claimed serial numbers
+
+function serialPoolKey(year, set, player, cardType, parallel, printRun){
+  return [year, set, player, cardType, parallel || '', printRun].join('|');
+}
+
+// Claims and returns a previously-unused serial number (1..printRun) for this
+// exact card, persisting the claim immediately. Returns null if the entire
+// print run has already been claimed in this life (variant can't occur again).
+function claimSerial(year, set, player, cardType, parallel, printRun){
+  const key = serialPoolKey(year, set, player, cardType, parallel, printRun);
+  if(!USED_SERIALS[key]) USED_SERIALS[key] = [];
+  const used = USED_SERIALS[key];
+  if(used.length >= printRun) return null; // fully exhausted for this exact card in this life
+
+  let n = randInt(1, printRun);
+  if(used.includes(n)){
+    // fall back to a linear scan so we never falsely report exhaustion near the end of a print run
+    let found = null;
+    for(let i=1; i<=printRun; i++){ if(!used.includes(i)){ found = i; break; } }
+    if(found == null) return null;
+    n = found;
+  }
+  used.push(n);
+  saveUsedSerials();
+  return n;
+}
+
+function resetUsedSerials(){
+  USED_SERIALS = {};
+  saveUsedSerials();
+}
+
+// ============================================================================
+// Card pricing is now a pure in-game system — NO external market data, NO
+// star-tier multipliers made up on the spot. Every dollar figure below comes
+// from two transparent, editable tables: RARITY_BUYBACK_TABLE (keyed off the
+// card's real Jumbo odds) and HOBBY_MARKET_TIERS (a plain hobby-popularity
+// tier list you maintain yourself). This does not claim to be real card
+// market value.
+// ============================================================================
+
+// crypto-backed RNG, used specifically for the Random Team draw so team
+// assignment isn't derived from Math.random()'s weaker PRNG.
+function cryptoRandom(){
+  if(typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues){
+    const arr = new Uint32Array(1);
+    window.crypto.getRandomValues(arr);
+    return arr[0] / 4294967296; // 2^32
+  }
+  return Math.random();
+}
+function cryptoShuffle(arr){
+  const a = [...arr];
+  for(let i=a.length-1; i>0; i--){
+    const j = Math.floor(cryptoRandom() * (i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+// ---- RARITY_BUYBACK_TABLE: official Jumbo odds -> in-game base buyback ($) ----
+// Edit freely; rarer odds bracket = higher base value.
+const RARITY_BUYBACK_TABLE = [
+  {max:10,      value:1},
+  {max:30,      value:3},
+  {max:75,      value:5},
+  {max:150,     value:8},
+  {max:300,     value:12},
+  {max:750,     value:20},
+  {max:1500,    value:35},
+  {max:3000,    value:60},
+  {max:7500,    value:100},
+  {max:15000,   value:175},
+  {max:50000,   value:300},
+  {max:150000,  value:600},
+  {max:Infinity,value:1000},
+];
+function rarityBaseValue(odds){
+  for(const tier of RARITY_BUYBACK_TABLE){ if(odds <= tier.max) return tier.value; }
+  return 1000;
+}
+
+// ---- HOBBY_MARKET_TIERS: your own Hobby 卡市熱門 tier list, edit freely ----
+const HOBBY_MARKET_TIERS = {
+  // S+ ×3.0
+  "Shohei Ohtani": 3.0,
+  "Aaron Judge": 3.0,
+  "Paul Skenes": 3.0,
+  "Mike Trout": 3.0,
+  "Ken Griffey Jr.": 3.0,
+  "Derek Jeter": 3.0,
+  "Ichiro": 3.0,
+
+  // S ×2.3
+  "Roman Anthony": 2.3,
+  "Konnor Griffin": 2.3,
+  "Bobby Witt Jr.": 2.3,
+  "Gunnar Henderson": 2.3,
+  "Elly De La Cruz": 2.3,
+  "Ronald Acuña Jr.": 2.3,
+  "Fernando Tatis Jr.": 2.3,
+  "Julio Rodríguez": 2.3,
+  "Mookie Betts": 2.3,
+  "Bryce Harper": 2.3,
+  "Jac Caglianone": 2.3,
+  "Kevin McGonigle": 2.3,
+  "Cal Ripken Jr.": 2.3,
+  "David Ortiz": 2.3,
+
+  // A ×1.8
+  "Juan Soto": 1.8,
+  "Vladimir Guerrero Jr.": 1.8,
+  "Yoshinobu Yamamoto": 1.8,
+  "Roki Sasaki": 1.8,
+  "Munetaka Murakami": 1.8,
+  "JJ Wetherholt": 1.8,
+  "Samuel Basallo": 1.8,
+  "Chase Burns": 1.8,
+  "Jacob Misiorowski": 1.8,
+  "Nick Kurtz": 1.8,
+  "Junior Caminero": 1.8,
+  "Jackson Holliday": 1.8,
+  "Jackson Chourio": 1.8,
+  "James Wood": 1.8,
+  "Corbin Carroll": 1.8,
+  "Freddie Freeman": 1.8,
+  "Manny Machado": 1.8,
+  "Francisco Lindor": 1.8,
+  "Albert Pujols": 1.8,
+  "Miguel Cabrera": 1.8,
+  "Chipper Jones": 1.8,
+
+  // B ×1.4
+  "Sal Stewart": 1.4,
+  "Cam Schlittler": 1.4,
+  "Colson Montgomery": 1.4,
+  "Bryce Eldridge": 1.4,
+  "Andrew Painter": 1.4,
+  "Justin Crawford": 1.4,
+  "Carson Benge": 1.4,
+  "Trey Yesavage": 1.4,
+  "Christian Moore": 1.4,
+  "Kazuma Okamoto": 1.4,
+  "Bubba Chandler": 1.4,
+  "Pete Crow-Armstrong": 1.4,
+  "Cal Raleigh": 1.4,
+  "Tarik Skubal": 1.4
+};
+const DEFAULT_HOBBY_MULTIPLIER = 1.0;
+function playerMultiplier(name){
+  return HOBBY_MARKET_TIERS[name] ?? DEFAULT_HOBBY_MULTIPLIER;
+}
+function hobbyTier(name){
+  const mult = playerMultiplier(name);
+  if(mult === 3.0) return "S+";
+  if(mult === 2.3) return "S";
+  if(mult === 1.8) return "A";
+  if(mult === 1.4) return "B";
+  return "一般";
+}
+
+// ============================================================================
+// Slot-based pack model.
+// A Jumbo box has exactly BOX_CARDS physical card slots. Exactly
+// BOX_AUTO_GUARANTEE of them are autographs (drawn from a dedicated weighted
+// lottery among only the auto/auto-relic sets — never "roll everything
+// independently, then top up if short"). The remaining slots are each
+// resolved with ONE weighted draw across {Base, every Parallel tier, every
+// Insert tier, every non-auto Memorabilia tier}, so a single physical card
+// slot can only ever become one specific thing — this is what keeps the
+// long-run frequency of each variant converging on its real Jumbo 1:X odds
+// without any slot ever being double- or over-counted.
+// ============================================================================
+
+function buildNonAutoPool(){
+  const list = [];
+  INSERT_SETS.forEach(set=>{
+    set.tiers.forEach(t=> list.push({
+      parallel:t.parallel, odds:t.odds, printRun:t.printRun, bucket:t.bucket,
+      cardType:set.label, cards:set.cards, dual:!!set.dual, category:'Insert',
+      isAuto:false, isRC:false, oneOfOne:!!t.printRun && t.printRun===1
+    }));
+  });
+  AUTO_SETS.filter(s=>!s.isAuto).forEach(set=>{
+    set.tiers.forEach(t=> list.push({
+      parallel:t.parallel, odds:t.odds, printRun:t.printRun, bucket:t.bucket,
+      cardType:set.label, cards:set.cards, dual:!!set.dual, category:'Memorabilia',
+      isAuto:false, isRC:false, oneOfOne:!!t.printRun && t.printRun===1
+    }));
+  });
+  PARALLEL_POOL.forEach(pp=>{
+    list.push({
+      parallel:pp.name, odds:pp.odds, printRun:pp.printRun, bucket:pp.bucket,
+      cardType:'Base', cards:null, dual:false, category:'Parallel',
+      isAuto:false, isRC:false, oneOfOne:!!pp.printRun && pp.printRun===1
+    });
+  });
+  return list;
+}
+function buildAutoPool(){
+  const list = [];
+  AUTO_SETS.filter(s=>s.isAuto).forEach(set=>{
+    const category = set.label.indexOf('Logoman') !== -1 ? 'Memorabilia' : 'Autographs';
+    set.tiers.forEach(t=> list.push({
+      parallel:t.parallel, odds:t.odds, printRun:t.printRun, bucket:t.bucket,
+      cardType:set.label, cards:set.cards, dual:!!set.dual, category,
+      isAuto:true, isRC:!!set.isRC, oneOfOne:!!set.oneOfOne || (!!t.printRun && t.printRun===1)
+    }));
+  });
+  return list;
+}
+const NONAUTO_POOL = buildNonAutoPool();
+const AUTO_POOL = buildAutoPool();
+const NONAUTO_SLOTS_PER_BOX = BOX_CARDS - BOX_AUTO_GUARANTEE;
+
+const NONAUTO_WEIGHTS = NONAUTO_POOL.map(t => (BOX_PACKS / t.odds) / NONAUTO_SLOTS_PER_BOX);
+const NONAUTO_BASE_WEIGHT = Math.max(0, 1 - NONAUTO_WEIGHTS.reduce((a,b)=>a+b, 0));
+
+// One weighted draw for a single non-auto slot. Returns null for a plain Base card.
+function pickNonAutoSlot(){
+  let r = Math.random();
+  if(r < NONAUTO_BASE_WEIGHT) return null;
+  r -= NONAUTO_BASE_WEIGHT;
+  for(let i=0; i<NONAUTO_POOL.length; i++){
+    if(r < NONAUTO_WEIGHTS[i]) return NONAUTO_POOL[i];
+    r -= NONAUTO_WEIGHTS[i];
+  }
+  return null;
+}
+
+function weightedPickTier(tiers){
+  const weights = tiers.map(t=>1/t.odds);
+  const total = weights.reduce((a,b)=>a+b, 0);
+  let r = Math.random() * total;
+  for(let i=0; i<tiers.length; i++){ if(r < weights[i]) return tiers[i]; r -= weights[i]; }
+  return tiers[tiers.length-1];
+}
+
+function resolvePlayer(t){
+  if(t.cardType === 'Base'){
+    const entry = pick(BASE_CHECKLIST);
+    return {name: entry.name, teams: [entry.team], isRC: entry.rc};
+  }
+  if(t.dual){
+    const entry = pick(t.cards);
+    return {name: entry.names.filter(Boolean).join(' & '), teams: entry.teams, isRC: false};
+  }
+  const entry = pick(t.cards);
+  return {name: entry.name, teams: [entry.team], isRC: !!t.isRC};
+}
+
+// Builds a priced card object, or null if a numbered variant's print run is
+// already fully claimed in this life (see USED_SERIALS above).
+function buildCard(t, p, isAutoSlot){
+  let serial = null;
+  if(t.printRun){
+    const claimed = claimSerial(YEAR, SET_NAME, p.name, t.cardType, t.parallel, t.printRun);
+    if(claimed == null) return null;
+    serial = t.printRun === 1 ? '1/1' : `${claimed}/${t.printRun}`;
+  }
+  const base = rarityBaseValue(t.odds);
+  const mult = playerMultiplier(p.name);
+  const buyback = Math.round(base * mult * 100) / 100;
+  return {
+    year: YEAR, set: SET_NAME, player: p.name, team: p.teams.filter(Boolean).join('/'),
+    category: t.category, cardType: t.cardType, parallel: t.parallel, printRun: t.printRun,
+    serialNumber: serial, isAuto: isAutoSlot, isRC: p.isRC,
+    jumboOdds: t.odds, rarityBaseValue: base, playerMultiplier: mult,
+    buyback, bucket: t.bucket
+  };
+}
+
+function simulateCandidates(myTeams){
+  const myTeamSet = new Set(myTeams);
+  const candidates = [];
+  const myBase = [];
+
+  for(let b=0; b<CASE_BOXES; b++){
+    for(let i=0; i<BOX_AUTO_GUARANTEE; i++){
+      const t = weightedPickTier(AUTO_POOL);
+      const p = resolvePlayer(t);
+      if(p.teams.some(tm=>tm && myTeamSet.has(tm))){
+        const card = buildCard(t, p, true);
+        if(card) candidates.push(card);
+      }
+    }
+    for(let i=0; i<NONAUTO_SLOTS_PER_BOX; i++){
+      const t = pickNonAutoSlot();
+      if(t === null){
+        const entry = pick(BASE_CHECKLIST);
+        if(entry.team && myTeamSet.has(entry.team)){
+          myBase.push({name: entry.name, rc: entry.rc});
+        }
+        continue;
+      }
+      const p = resolvePlayer(t);
+      if(p.teams.some(tm=>tm && myTeamSet.has(tm))){
+        const card = buildCard(t, p, false);
+        if(card) candidates.push(card);
+      }
+    }
+  }
+
+  return {candidates, myBase};
+}
+
+function simulateCase(myTeams){
+  const {candidates, myBase} = simulateCandidates(myTeams);
+  const pulls = {refractor:[], numbered:[], insert:[], auto:[], case_hit:[]};
+  candidates.forEach(c=> pulls[c.bucket].push(c));
+  return {pulls, myBase};
+}
+
+// ============================================================================
+// Developer-only odds verification. Not wired to any UI button — open the
+// browser console and call devTestOdds() (optionally devTestOdds(200000) for
+// a specific pack count). Simulates that many packs' worth of slots and
+// prints observed vs official Jumbo odds per variant.
+// ============================================================================
+function devTestOdds(targetPacks){
+  targetPacks = targetPacks || 100000;
+  const boxCount = Math.ceil(targetPacks / BOX_PACKS);
+  const allTiers = [...NONAUTO_POOL, ...AUTO_POOL];
+  const counts = new Map();
+  allTiers.forEach(t=> counts.set(t, 0));
+  let baseCount = 0;
+
+  for(let b=0; b<boxCount; b++){
+    for(let i=0; i<BOX_AUTO_GUARANTEE; i++){
+      const t = weightedPickTier(AUTO_POOL);
+      counts.set(t, counts.get(t) + 1);
+    }
+    for(let i=0; i<NONAUTO_SLOTS_PER_BOX; i++){
+      const t = pickNonAutoSlot();
+      if(t === null){ baseCount++; continue; }
+      counts.set(t, counts.get(t) + 1);
+    }
+  }
+
+  const totalPacks = boxCount * BOX_PACKS;
+  const rows = allTiers.map(t=>{
+    const hits = counts.get(t);
+    const observedOdds = hits > 0 ? Math.round(totalPacks / hits) : null;
+    return {
+      variant: `${t.cardType} · ${t.parallel || 'base'}`,
+      officialOdds: '1:' + t.odds,
+      observedOdds: observedOdds ? ('1:' + observedOdds) : 'no hits',
+      hits
+    };
+  });
+  console.log(`devTestOdds: simulated ${boxCount} boxes (${totalPacks} packs)`);
+  console.table(rows);
+  console.log('Base cards:', baseCount, '/', boxCount * NONAUTO_SLOTS_PER_BOX,
+    '=', (baseCount / (boxCount * NONAUTO_SLOTS_PER_BOX) * 100).toFixed(2) + '%');
+  return rows;
+}
+if(typeof window !== 'undefined') window.devTestOdds = devTestOdds;
+
+
+// ============ Career / bankroll persistence ============
+const CAREER_KEY = 'teamBreakCareerV2';
+function loadCareer(){
+  try{
+    const raw = localStorage.getItem(CAREER_KEY);
+    if(raw){ const c = JSON.parse(raw); if(typeof c.cash === 'number') return c; }
+  }catch(e){}
+  return {cash: STARTING_CASH, startingCash: STARTING_CASH, gamesPlayed:0, totalSpent:0, totalMarketValue:0, totalPayout:0, bestPull:null};
+}
+function saveCareer(){ try{ localStorage.setItem(CAREER_KEY, JSON.stringify(career)); }catch(e){} }
+let career = loadCareer();
+let lastCost = 0;
+
+function isBankrupt(){ return career.cash < ENTRY_PRICE; }
+
+function renderCareerBar(){
+  const net = career.totalPayout - career.totalSpent;
+  const roi = career.totalSpent > 0 ? (net / career.totalSpent * 100) : 0;
+  const grid = document.getElementById('career-grid');
+  grid.innerHTML = `
+    <div class="stat-cell"><div class="lbl">起始資金</div><div class="val">${money(career.startingCash)}</div></div>
+    <div class="stat-cell"><div class="lbl">目前現金</div><div class="val gold">${money(career.cash)}</div></div>
+    <div class="stat-cell"><div class="lbl">已參團場數</div><div class="val">${career.gamesPlayed}</div></div>
+    <div class="stat-cell"><div class="lbl">累計投入</div><div class="val">${money(career.totalSpent)}</div></div>
+    <div class="stat-cell"><div class="lbl">累計卡片市值</div><div class="val">${money(career.totalMarketValue)}</div></div>
+    <div class="stat-cell"><div class="lbl">累計實際回收</div><div class="val">${money(career.totalPayout)}</div></div>
+    <div class="stat-cell"><div class="lbl">累計損益</div><div class="val ${net>=0?'pos':'neg'}">${money(net)}</div></div>
+    <div class="stat-cell"><div class="lbl">ROI</div><div class="val ${roi>=0?'pos':'neg'}">${roi.toFixed(1)}%</div></div>
+    <div class="stat-cell"><div class="lbl">生涯最佳拉卡</div><div class="val gold" style="font-size:13px;line-height:1.4;">${career.bestPull ? career.bestPull.title + '（' + money(career.bestPull.price) + '）' : '尚無紀錄'}</div></div>
+  `;
+}
+
+function resetCareer(){
+  career = {cash: STARTING_CASH, startingCash: STARTING_CASH, gamesPlayed:0, totalSpent:0, totalMarketValue:0, totalPayout:0, bestPull:null};
+  saveCareer();
+  resetUsedSerials();
+  renderCareerBar();
+  document.getElementById('panel-bankrupt').style.display = 'none';
+  document.getElementById('panel-setup').style.display = 'block';
+  document.getElementById('panel-board').style.display = 'none';
+  document.getElementById('panel-results').style.display = 'none';
+  updateEntryUI();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+// window.confirm()/alert() are blocked inside this sandboxed preview, so use an
+// inline "click again to confirm" pattern on the button itself instead.
+function attachConfirmReset(btn, normalLabel, confirmLabel){
+  let armed = false;
+  let timer = null;
+  btn.textContent = normalLabel;
+  btn.addEventListener('click', ()=>{
+    if(!armed){
+      armed = true;
+      btn.textContent = confirmLabel;
+      btn.classList.add('count-hint','warn'); // reuse warn color via inline style fallback below
+      btn.style.borderColor = '#ff9d90';
+      btn.style.color = '#ff9d90';
+      clearTimeout(timer);
+      timer = setTimeout(()=>{
+        armed = false;
+        btn.textContent = normalLabel;
+        btn.style.borderColor = '';
+        btn.style.color = '';
+      }, 4000);
+    } else {
+      clearTimeout(timer);
+      armed = false;
+      btn.textContent = normalLabel;
+      btn.style.borderColor = '';
+      btn.style.color = '';
+      resetCareer();
+    }
+  });
+}
+attachConfirmReset(document.getElementById('btn-reset-career'), '🔄 重新開始人生', '⚠️ 再按一次確認清空');
+attachConfirmReset(document.getElementById('btn-restart'), '🔄 重新開始人生', '⚠️ 再按一次確認清空');
+
+function renderBankruptScreen(){
+  const grid = document.getElementById('bankrupt-grid');
+  grid.innerHTML = `
+    <div class="stat-cell"><div class="lbl">你總共撐了</div><div class="val">${career.gamesPlayed} 場</div></div>
+    <div class="stat-cell"><div class="lbl">起始資金</div><div class="val">${money(career.startingCash)}</div></div>
+    <div class="stat-cell"><div class="lbl">累計投入</div><div class="val">${money(career.totalSpent)}</div></div>
+    <div class="stat-cell"><div class="lbl">累計回收</div><div class="val">${money(career.totalPayout)}</div></div>
+    <div class="stat-cell" style="grid-column:1/-1;"><div class="lbl">生涯最佳拉卡</div><div class="val gold" style="font-size:14px;">${career.bestPull ? career.bestPull.title + '（' + money(career.bestPull.price) + '）' : '尚無紀錄'}</div></div>
+  `;
+  document.getElementById('panel-setup').style.display = 'none';
+  document.getElementById('panel-board').style.display = 'none';
+  document.getElementById('panel-results').style.display = 'none';
+  document.getElementById('panel-bankrupt').style.display = 'block';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+// ============ Draft (team assignment + payment) ============
+let assignments = [];
+
+function updateEntryUI(){
+  let entries = parseInt(document.getElementById('entries').value, 10);
+  if(isNaN(entries) || entries < 1) entries = 1;
+  if(entries > MAX_ENTRIES) entries = MAX_ENTRIES;
+  const cost = entries * ENTRY_PRICE;
+  const hint = document.getElementById('count-hint');
+  const btn = document.getElementById('btn-draft');
+  if(isBankrupt()){
+    hint.textContent = `現金只剩 ${money(career.cash)}，不足以支付最低 ${money(ENTRY_PRICE)} 參團費`;
+    hint.classList.add('warn');
+    btn.disabled = true;
+  } else if(career.cash < cost){
+    hint.textContent = `${entries} 注需要 ${money(cost)}，但你只有 ${money(career.cash)}`;
+    hint.classList.add('warn');
+    btn.disabled = true;
+  } else {
+    hint.textContent = `參團成本 ${money(cost)} → 付款後現金 ${money(career.cash - cost)}`;
+    hint.classList.remove('warn');
+    btn.disabled = false;
+  }
+}
+document.getElementById('entries').addEventListener('input', updateEntryUI);
+
+// Random Team: 30 teams, exactly equal probability, drawn with
+// crypto.getRandomValues() rather than Math.random(). No popularity weighting,
+// no avoidance of repeats from a prior game — every draw is fully independent.
+function doDraft(){
+  let entries = parseInt(document.getElementById('entries').value, 10);
+  if(isNaN(entries) || entries < 1) entries = 1;
+  if(entries > MAX_ENTRIES) entries = MAX_ENTRIES;
+  const cost = entries * ENTRY_PRICE;
+
+  if(isBankrupt() || career.cash < cost){
+    updateEntryUI();
+    return;
+  }
+
+  career.cash -= cost;
+  career.gamesPlayed += 1;
+  career.totalSpent += cost;
+  saveCareer();
+  renderCareerBar();
+  lastCost = cost;
+
+  const teams = cryptoShuffle(TEAMS).slice(0, entries);
+  assignments = teams.map(t=>({mine:true, team:t}));
+
+  document.getElementById('count-hint').textContent =
+    `已付款 ${money(cost)}（${entries} 注），隨機分配完成`;
+  document.getElementById('count-hint').classList.remove('warn');
+
+  const board = document.getElementById('board');
+  board.innerHTML = '';
+  assignments.forEach((a,i)=>{
+    const div = document.createElement('div');
+    div.className = 'slot mine';
+    div.innerHTML = `
+      <div class="bar" style="background:${a.team.c1}"></div>
+      <div class="pick">TEAM ${i+1}</div>
+      <div class="team">${a.team.abbr} · ${a.team.name}</div>
+    `;
+    board.appendChild(div);
+  });
+
+  document.getElementById('panel-board').style.display = 'block';
+  document.getElementById('panel-results').style.display = 'none';
+  document.getElementById('panel-board').scrollIntoView({behavior:'smooth', block:'start'});
+}
+document.getElementById('btn-draft').addEventListener('click', doDraft);
+
+// ============ Break rendering ============
+function renderStatsBox(){
+  const box = document.getElementById('stats-box');
+  box.innerHTML = `
+    <div class="stats-title">本場規格與官方 Jumbo Pack Odds（2026 Topps Chrome Baseball）</div>
+    <div class="odds-row"><span>Case 結構</span><span><b>${CASE_BOXES}</b> Boxes × ${BOX_PACKS} Packs × ${PACK_CARDS} Cards = <b>${fmt(CASE_PACKS)}</b> Packs / <b>${fmt(CASE_CARDS)}</b> Cards</span></div>
+    <div class="odds-row"><span>簽名保底</span><span>每箱固定 <b>${BOX_AUTO_GUARANTEE}</b> 張，直接從 Auto 系列加權抽出，不獨立 Roll 全部系列再補</span></div>
+    <div class="odds-row"><span>主要 Refractor</span><span>Refractor 1:1｜Negative 1:63｜Pink /250 1:102｜Aqua /199 1:127｜Blue /150 1:168｜Green /99 1:256｜Gold /50 1:506｜Orange /25 1:1,011</span></div>
+    <div class="odds-row"><span>Case Hit 平行卡</span><span>Black /10 1:2,518｜Red /5 1:5,035｜Printing Plates 1/1 1:6,353｜FrozenFractor 1:927｜SuperFractor 1/1 1:24,256</span></div>
+    <div class="odds-row"><span>Insert</span><span>1991 Topps Baseball 1:4</span></div>
+    <div class="odds-row"><span>簽名卡</span><span>Rookie Autographs 1:14｜Ink Strokes 1:153｜75th Diamond 1:294｜Chromographs 1:1,682｜World Series Champions 1:1,304</span></div>
+    <div class="odds-row"><span>終極 Case Hit</span><span>Gold Logoman Relic 1:100,056｜Gold Logoman Autograph Relic 1:400,224（整場幾乎不會出現，這就是真實比例）</span></div>
+    <div class="odds-row"><span>限量卡序號</span><span>同一人生內每個 /X 序號終身唯一，抽過的號碼不會再出現，整個印刷量用完該版本就永久停產</span></div>
+    <div class="odds-row"><span>系統買回</span><span>rarityBaseValue（依 Jumbo odds）× Hobby 市場熱度權重，純遊戲內經濟，非真實卡價</span></div>
+  `;
+}
+
+function cardDetailBlock(c){
+  return `
+    <span>Jumbo Odds：1:${fmt(c.jumboOdds)}</span>
+    <span class="pmeta">基礎價：${money(c.rarityBaseValue)}</span>
+    <span class="pmeta">市場熱度：${hobbyTier(c.player)} ×${c.playerMultiplier}</span>
+    <span class="pmeta">系統買回：${money(c.buyback)}</span>
+  `;
+}
+
+function renderBucket(container, bucketKey, items){
+  const wrap = document.createElement('div');
+  wrap.className = 'bucket';
+  wrap.innerHTML = `<div class="bucket-head"><span class="bname">${BUCKET_LABELS[bucketKey]}</span><span class="bcount">${items.length} 張</span></div>`;
+  const list = document.createElement('div');
+  list.className = 'bucket-list';
+  if(items.length === 0){
+    list.innerHTML = `<div class="bucket-empty">本場沒拉到</div>`;
+  } else {
+    items.forEach(it=>{
+      const div = document.createElement('div');
+      div.className = `pull rarity-${bucketKey}`;
+      const serial = it.serialNumber ? `<span class="pmeta">${it.serialNumber}</span>` : '';
+      const rc = it.isRC ? `<span class="rc-badge">RC</span>` : '';
+      const parallelLabel = it.parallel ? `${it.parallel}${it.isAuto ? ' Auto' : ''}` : (it.isAuto ? 'Base Auto' : 'Base');
+      div.innerHTML = `
+        <div class="pull-top">
+          <span class="pname">${it.player}${rc}<span class="pmeta">${it.team} · ${it.cardType} · ${parallelLabel}</span>${serial}</span>
+        </div>
+        <div class="pull-price">${cardDetailBlock(it)}</div>
+      `;
+      list.appendChild(div);
+    });
+  }
+  wrap.appendChild(list);
+  container.appendChild(wrap);
+}
+
+function renderMyResults(sim){
+  const container = document.getElementById('my-results');
+  container.innerHTML = '';
+
+  BUCKET_ORDER.forEach(bk=>{
+    renderBucket(container, bk, sim.pulls[bk]);
+  });
+
+  // base cards collapsed — always worthless, never priced
+  const baseWrap = document.createElement('div');
+  baseWrap.className = 'base-summary';
+  baseWrap.innerHTML = `
+    <span class="bcount">Base Cards × ${sim.myBase.length}（垃圾卡，回收 $0）</span>
+    <button class="btn-ghost btn-small" id="btn-toggle-base">展開球員名單</button>
+  `;
+  container.appendChild(baseWrap);
+
+  const baseList = document.createElement('div');
+  baseList.className = 'base-list';
+  baseList.id = 'base-list';
+  sim.myBase.forEach(b=>{
+    const div = document.createElement('div');
+    div.className = 'pull rarity-base';
+    const rc = b.rc ? `<span class="rc-badge">RC</span>` : '';
+    div.innerHTML = `<div class="pull-top"><span class="pname">${b.name}${rc}</span><span class="ptag">$0</span></div>`;
+    baseList.appendChild(div);
+  });
+  container.appendChild(baseList);
+
+  document.getElementById('btn-toggle-base').addEventListener('click', ()=>{
+    const open = baseList.classList.toggle('open');
+    document.getElementById('btn-toggle-base').textContent = open ? '收合球員名單' : '展開球員名單';
+  });
+}
+
+function allMySpecialPulls(sim){
+  const flat = [];
+  BUCKET_ORDER.forEach(bk=> sim.pulls[bk].forEach(it=> flat.push(it)));
+  return flat; // base cards intentionally excluded — always $0
+}
+
+function doBreak(){
+  const myTeams = assignments.filter(a=>a.mine).map(a=>a.team.abbr);
+  const sim = simulateCase(myTeams);
+
+  renderStatsBox();
+  renderMyResults(sim);
+
+  const flat = allMySpecialPulls(sim);
+  let payout = 0;
+  let best = null;
+  flat.forEach(c=>{
+    payout += c.buyback;
+    if(!best || c.buyback > best.buyback) best = c;
+  });
+
+  const net = payout - lastCost;
+
+  career.cash += payout;
+  career.totalMarketValue += payout;
+  career.totalPayout += payout;
+  if(best && (!career.bestPull || best.buyback > career.bestPull.price)){
+    career.bestPull = {title: `${best.player}（${best.cardType}${best.parallel ? ' · '+best.parallel : ''}${best.serialNumber ? ' · '+best.serialNumber : ''}）`, price: best.buyback};
+  }
+  saveCareer();
+  renderCareerBar();
+
+  const settle = document.getElementById('settle-box');
+  settle.innerHTML = `
+    <div class="stats-title">本場結算</div>
+    <div class="odds-row"><span>參團成本</span><span><b>${money(lastCost)}</b></span></div>
+    <div class="odds-row"><span>系統買回總額</span><span><b>${money(payout)}</b></span></div>
+    <div class="odds-row"><span>本場損益</span><span style="color:${net>=0?'var(--good)':'#ff9d90'}"><b>${money(net)}</b></span></div>
+    <div class="odds-row"><span>最新現金餘額</span><span><b>${money(career.cash)}</b></span></div>
+  `;
+
+  const banner = document.getElementById('banner');
+  if(best){
+    banner.style.display = 'flex';
+    banner.innerHTML = `
+      <div>
+        <div class="label">🏆 本場最佳拉卡</div>
+        <div class="headline">${best.player}${best.parallel ? ' · ' + best.parallel : ''}${best.serialNumber ? ' · ' + best.serialNumber : ''}</div>
+      </div>
+      <div class="owner-tag">系統買回 ${money(best.buyback)}</div>
+    `;
+  } else {
+    banner.style.display = 'none';
+  }
+
+  document.getElementById('panel-results').style.display = 'block';
+  document.getElementById('panel-results').scrollIntoView({behavior:'smooth', block:'start'});
+
+  if(isBankrupt()){
+    setTimeout(renderBankruptScreen, 400);
+  }
+}
+document.getElementById('btn-break').addEventListener('click', doBreak);
+
+document.getElementById('btn-again').addEventListener('click', ()=>{
+  document.getElementById('panel-results').style.display = 'none';
+  document.getElementById('panel-board').style.display = 'none';
+  updateEntryUI();
+  document.getElementById('panel-setup').scrollIntoView({behavior:'smooth', block:'start'});
+});
+
+// ============ Init ============
+renderCareerBar();
+updateEntryUI();
+if(isBankrupt() && career.gamesPlayed > 0){
+  renderBankruptScreen();
+}
+
+</script>
+</body>
+</html>
