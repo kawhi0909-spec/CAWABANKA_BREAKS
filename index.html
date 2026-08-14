@@ -367,12 +367,17 @@ button:focus-visible{outline:2px solid var(--brand-blue-bright);outline-offset:2
 .stats-box .odds-row + .odds-row{margin-top:2px;}
 
 /* ---- Career bar ---- */
-.stat-featured-grid{
+.career-tier1{
   display:grid;
   grid-template-columns:repeat(3,1fr);
-  gap:12px;
-  margin-top:6px;
-  margin-bottom:12px;
+  gap:8px;
+}
+.career-tier2{
+  display:grid;
+  grid-template-columns:1fr 2fr auto;
+  gap:8px;
+  align-items:stretch;
+  margin-top:8px;
 }
 .stat-grid{
   display:grid;
@@ -381,22 +386,31 @@ button:focus-visible{outline:2px solid var(--brand-blue-bright);outline-offset:2
 }
 .stat-cell{
   border:1px solid var(--line);
-  border-radius:6px;
+  border-radius:5px;
   padding:12px 14px;
   background:rgba(6,10,18,0.26);
 }
-.stat-cell.featured{
-  border-color:var(--gold);
-  background:linear-gradient(160deg,rgba(224,185,63,0.14),rgba(6,10,18,0.3));
-  padding:14px 14px 16px;
-}
-.stat-cell.featured .lbl{color:var(--gold-bright);}
-.stat-cell.featured .val{font-size:22px;}
-.stat-cell .lbl{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;}
-.stat-cell .val{font-family:'Oswald',sans-serif;font-size:19px;font-weight:600;}
+.stat-cell.career-card{padding:9px 11px;}
+.stat-cell .lbl{font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin-bottom:3px;}
+.stat-cell .val{font-family:'Oswald',sans-serif;font-size:17px;font-weight:600;color:var(--chalk);}
 .stat-cell .val.pos{color:var(--good);}
 .stat-cell .val.neg{color:#ff8a98;}
 .stat-cell .val.gold{color:var(--gold-bright);}
+.stat-cell .val.lightblue{color:var(--light-blue);}
+.career-best{
+  border:1px solid var(--line);
+  border-radius:5px;
+  padding:9px 12px;
+  background:rgba(6,10,18,0.26);
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:3px;
+  min-width:0;
+}
+.career-best .lbl{font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;}
+.career-best .val{font-family:'Oswald',sans-serif;font-size:13.5px;font-weight:600;color:var(--gold-bright);line-height:1.4;overflow-wrap:anywhere;}
+.career-tier2 #btn-reset-career{align-self:stretch;white-space:nowrap;}
 
 /* ---- Bucket list (my pulls) ---- */
 .section-label{
@@ -532,8 +546,9 @@ button:focus-visible{outline:2px solid var(--brand-blue-bright);outline-offset:2
     min-width:0;
   }
 
-  .stat-featured-grid{grid-template-columns:1fr;gap:8px;}
-  .stat-cell.featured .val{font-size:24px;}
+  .career-tier1{grid-template-columns:repeat(2,1fr);gap:8px;}
+  .career-tier2{grid-template-columns:1fr;gap:8px;margin-top:8px;}
+  .career-tier2 #btn-reset-career{width:100%;}
   .stat-grid{grid-template-columns:repeat(2,1fr);gap:10px;}
   .stat-cell{padding:10px 12px;}
   .stat-cell .val{font-size:16px;}
@@ -570,8 +585,10 @@ button:focus-visible{outline:2px solid var(--brand-blue-bright);outline-offset:2
   <!-- Career bar -->
   <div class="panel" id="career-bar">
     <h2>生涯紀錄 <span class="h2-note">資料存在瀏覽器</span></h2>
-    <div id="career-grid"></div>
-    <div class="row">
+    <div class="career-tier1" id="career-tier1"></div>
+    <div class="career-tier2">
+      <div id="career-spent"></div>
+      <div id="career-best"></div>
       <button class="btn-ghost btn-small" id="btn-reset-career">🔄 重新開始人生</button>
     </div>
   </div>
@@ -617,7 +634,6 @@ button:focus-visible{outline:2px solid var(--brand-blue-bright);outline-offset:2
   <!-- STEP 3: break results -->
   <div class="panel" id="panel-results" style="display:none;">
     <h2>拆卡結果</h2>
-    <p class="desc">機率、選手與 Case 規格完全比照 2026 Topps Chrome Baseball Jumbo 官方數據，逐包獨立模擬，沒有額外加成。</p>
     <div class="stats-box" id="stats-box" style="display:none;"></div>
 
     <h3 class="section-label">我抽到的卡片結果</h3>
@@ -2469,19 +2485,19 @@ function cryptoShuffle(arr){
 // ---- RARITY_BUYBACK_TABLE: official Jumbo odds -> in-game base buyback ($) ----
 // Edit freely; rarer odds bracket = higher base value.
 const RARITY_BUYBACK_TABLE = [
-  {max:10,      value:1},
-  {max:30,      value:3},
-  {max:75,      value:5},
-  {max:150,     value:8},
-  {max:300,     value:12},
-  {max:750,     value:20},
-  {max:1500,    value:35},
-  {max:3000,    value:60},
-  {max:7500,    value:100},
-  {max:15000,   value:175},
-  {max:50000,   value:300},
-  {max:150000,  value:600},
-  {max:Infinity,value:1000},
+  {max:10,      value:3},
+  {max:30,      value:6},
+  {max:75,      value:10},
+  {max:150,     value:15},
+  {max:300,     value:25},
+  {max:750,     value:40},
+  {max:1500,    value:65},
+  {max:3000,    value:100},
+  {max:7500,    value:175},
+  {max:15000,   value:275},
+  {max:50000,   value:450},
+  {max:150000,  value:800},
+  {max:Infinity,value:1250},
 ];
 function rarityBaseValue(odds){
   for(const tier of RARITY_BUYBACK_TABLE){ if(odds <= tier.max) return tier.value; }
@@ -2895,20 +2911,22 @@ function isBankrupt(){ return career.cash < ENTRY_PRICE; }
 function renderCareerBar(){
   const net = career.totalPayout - career.totalSpent; // internal calc unchanged — just not labeled as "recovery" in the UI
   const roi = career.totalSpent > 0 ? (net / career.totalSpent * 100) : 0;
-  const grid = document.getElementById('career-grid');
-  grid.innerHTML = `
-    <div class="stat-featured-grid">
-      <div class="stat-cell featured"><div class="lbl">目前現金</div><div class="val gold">${money(career.cash)}</div></div>
-      <div class="stat-cell featured"><div class="lbl">累計卡片市值</div><div class="val">${money(career.totalMarketValue)}</div></div>
-      <div class="stat-cell featured"><div class="lbl">生涯損益</div><div class="val ${net>=0?'pos':'neg'}">${money(net)}</div></div>
-    </div>
-    <div class="stat-grid">
-      <div class="stat-cell"><div class="lbl">起始資金</div><div class="val">${money(career.startingCash)}</div></div>
-      <div class="stat-cell"><div class="lbl">已參團場數</div><div class="val">${career.gamesPlayed}</div></div>
-      <div class="stat-cell"><div class="lbl">累計投入</div><div class="val">${money(career.totalSpent)}</div></div>
-      <div class="stat-cell"><div class="lbl">生涯 ROI</div><div class="val ${roi>=0?'pos':'neg'}">${roi.toFixed(1)}%</div></div>
-      <div class="stat-cell" style="grid-column:1/-1;"><div class="lbl">生涯最佳卡</div><div class="val gold" style="font-size:13px;line-height:1.4;">${career.bestPull ? career.bestPull.title + '（' + money(career.bestPull.price) + '）' : '尚無紀錄'}</div></div>
-    </div>
+
+  document.getElementById('career-tier1').innerHTML = `
+    <div class="stat-cell career-card"><div class="lbl">目前現金</div><div class="val gold">${money(career.cash)}</div></div>
+    <div class="stat-cell career-card"><div class="lbl">累計卡片市值</div><div class="val lightblue">${money(career.totalMarketValue)}</div></div>
+    <div class="stat-cell career-card"><div class="lbl">生涯損益</div><div class="val ${net>=0?'pos':'neg'}">${money(net)}</div></div>
+    <div class="stat-cell career-card"><div class="lbl">起始資金</div><div class="val">${money(career.startingCash)}</div></div>
+    <div class="stat-cell career-card"><div class="lbl">已參團場數</div><div class="val">${career.gamesPlayed}</div></div>
+    <div class="stat-cell career-card"><div class="lbl">生涯 ROI</div><div class="val ${roi>=0?'pos':'neg'}">${roi.toFixed(1)}%</div></div>
+  `;
+
+  document.getElementById('career-spent').innerHTML = `
+    <div class="stat-cell career-card"><div class="lbl">累計投入</div><div class="val">${money(career.totalSpent)}</div></div>
+  `;
+
+  document.getElementById('career-best').innerHTML = `
+    <div class="career-best"><div class="lbl">生涯最佳卡</div><div class="val">${career.bestPull ? career.bestPull.title + '（' + money(career.bestPull.price) + '）' : '尚無紀錄'}</div></div>
   `;
 }
 
@@ -3119,7 +3137,7 @@ function renderMyResults(sim){
   const baseWrap = document.createElement('div');
   baseWrap.className = 'base-summary';
   baseWrap.innerHTML = `
-    <span class="bcount">Base Cards × ${sim.myBase.length}（垃圾卡，回收 $0）</span>
+    <span class="bcount">Base Cards × ${sim.myBase.length}（普卡，市值 $0）</span>
     <button class="btn-ghost btn-small" id="btn-toggle-base">展開球員名單</button>
   `;
   container.appendChild(baseWrap);
