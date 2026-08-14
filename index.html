@@ -3,50 +3,69 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>⚾️咖哇棒卡團拆人生 — MLB 團拆模擬器</title>
+<title>CAWABANKA_BREAKS — MLB 團拆模擬器</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
 
 :root{
-  --ink:#0f2438;
-  --stadium:#152e24;
-  --stadium-deep:#0b1f18;
-  --chalk:#f6f2e7;
-  --card-stock:#efe8d6;
-  --foil:#c9a227;
-  --foil-bright:#e8c766;
-  --rare:#b8382e;
+  /* ---- CAWABANKA BREAKS brand palette, sampled from the official logo ---- */
+  --ink:#0a1018;               /* dark navy-black, for text on light/blue chips */
+  --stadium:#12192a;           /* navy-blue background mid tone */
+  --stadium-deep:#080d16;      /* navy-black background deep tone */
+  --chalk:#ecf0fc;             /* main text — cream/off-white from logo lettering */
+  --card-stock:#d9e3e5;        /* light blue-gray, secondary light surface */
+  --panel-navy:#141d2c;        /* panel background */
+  --panel-navy-light:#1a2536;  /* input / inner surface background */
+  --field-blue:#2c4b68;        /* baseball-field blue, dark */
+  --field-blue-mid:#3d5981;    /* baseball-field blue, mid */
+  --brand-blue:#4c6b99;        /* primary brand blue — buttons, focus, general accents */
+  --brand-blue-bright:#7fa3d6; /* lighter blue — hover / secondary emphasis */
+  --light-blue:#9db8dd;        /* soft blue accent, e.g. Refractor tint */
+  --foil:var(--brand-blue);            /* legacy alias, now maps to brand blue */
+  --foil-bright:var(--brand-blue-bright); /* legacy alias, now maps to brand blue */
+  --gold:#e0b93f;              /* reserved highlight — Case Hit / best card / high value only */
+  --gold-bright:#fed557;       /* reserved highlight bright — from logo's yellow diamond */
+  --red:#ff415b;               /* from logo stitching/diamonds — Auto, warnings, negative P&L */
+  --rare:#d6304a;              /* deeper red — bankruptcy / severe warning */
   --good:#5fae7a;
-  --line:rgba(246,242,231,0.14);
-  --muted:rgba(246,242,231,0.55);
+  --line:rgba(236,240,252,0.14);
+  --muted:rgba(236,240,252,0.55);
 }
 *{box-sizing:border-box;}
 body{
   margin:0;
+  overflow-x:hidden;
   background:
-    radial-gradient(ellipse at 50% -10%, #1d4433 0%, var(--stadium) 45%, var(--stadium-deep) 100%);
+    radial-gradient(ellipse at 50% -10%, #1c2c42 0%, var(--stadium) 45%, var(--stadium-deep) 100%);
   color:var(--chalk);
   font-family:'Inter',sans-serif;
   min-height:100vh;
-  padding:40px 20px 80px;
+  padding:32px 20px 80px;
 }
 .wrap{max-width:1040px;margin:0 auto;}
 
 /* ---- Hero ---- */
 .hero{
   text-align:center;
-  padding:20px 0 44px;
+  padding:8px 0 32px;
   border-bottom:1px solid var(--line);
-  margin-bottom:36px;
+  margin-bottom:32px;
   position:relative;
 }
 .eyebrow{
   font-family:'JetBrains Mono',monospace;
-  font-size:12px;
-  letter-spacing:.28em;
-  color:var(--foil-bright);
+  font-size:11px;
+  letter-spacing:.26em;
+  color:var(--muted);
   text-transform:uppercase;
-  margin-bottom:14px;
+  margin-bottom:10px;
+}
+.hero-logo{
+  display:block;
+  margin:0 auto 14px;
+  width:220px;
+  max-width:100%;
+  height:auto;
 }
 h1{
   font-family:'Oswald',sans-serif;
@@ -57,16 +76,17 @@ h1{
   line-height:1.05;
   text-transform:uppercase;
 }
-h1 span{color:var(--foil-bright);}
+h1 span{color:var(--brand-blue-bright);}
 .sub{color:var(--muted);font-size:15px;max-width:520px;margin:0 auto;line-height:1.6;}
 
 /* ---- Panels ---- */
 .panel{
-  background:rgba(246,242,231,0.04);
+  background:rgba(76,107,153,0.05);
   border:1px solid var(--line);
-  border-radius:4px;
+  border-radius:8px;
   padding:28px;
-  margin-bottom:28px;
+  margin-bottom:24px;
+  box-shadow:0 3px 14px rgba(3,6,12,0.28);
 }
 .panel h2{
   font-family:'Oswald',sans-serif;
@@ -76,24 +96,34 @@ h1 span{color:var(--foil-bright);}
   margin:0 0 6px;
   display:flex;
   align-items:center;
+  flex-wrap:wrap;
   gap:10px;
 }
 .panel h2 .num{
   font-family:'JetBrains Mono',monospace;
   font-size:13px;
-  color:var(--foil-bright);
-  border:1px solid var(--foil);
+  color:var(--brand-blue-bright);
+  border:1px solid var(--brand-blue);
   padding:2px 8px;
-  border-radius:2px;
+  border-radius:3px;
+}
+.panel h2 .h2-note{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  font-weight:400;
+  text-transform:none;
+  letter-spacing:0;
+  color:var(--muted);
+  margin-left:auto;
 }
 .panel .desc{color:var(--muted);font-size:14px;margin-bottom:20px;line-height:1.6;}
 
 textarea{
   width:100%;
   min-height:150px;
-  background:rgba(0,0,0,0.25);
+  background:rgba(6,10,18,0.35);
   border:1px solid var(--line);
-  border-radius:3px;
+  border-radius:5px;
   color:var(--chalk);
   font-family:'JetBrains Mono',monospace;
   font-size:13px;
@@ -101,43 +131,74 @@ textarea{
   resize:vertical;
   line-height:1.7;
 }
-textarea:focus{outline:2px solid var(--foil-bright);outline-offset:1px;}
-textarea::placeholder{color:rgba(246,242,231,0.3);}
+textarea:focus{outline:2px solid var(--brand-blue-bright);outline-offset:1px;}
+textarea::placeholder{color:rgba(236,240,252,0.3);}
 
 .field{display:flex;flex-direction:column;gap:6px;}
 .field label{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:.05em;}
 input[type="text"], input[type="number"]{
-  background:rgba(0,0,0,0.25);
+  background:rgba(6,10,18,0.35);
   border:1px solid var(--line);
-  border-radius:3px;
+  border-radius:5px;
   color:var(--chalk);
   font-family:'JetBrains Mono',monospace;
   font-size:14px;
   padding:11px 12px;
   min-width:140px;
+  min-height:44px;
 }
 input[type="number"]{width:100px;min-width:0;}
-input:focus{outline:2px solid var(--foil-bright);outline-offset:1px;}
+input:focus{outline:2px solid var(--brand-blue-bright);outline-offset:1px;}
 input:disabled{opacity:.4;}
 
-.slot.mine{border-color:var(--foil-bright);box-shadow:0 0 0 1px var(--foil-bright) inset;}
+.select-wrap{position:relative;display:inline-block;}
+.select-wrap::after{
+  content:'▾';
+  position:absolute;
+  right:14px;
+  top:50%;
+  transform:translateY(-50%);
+  color:var(--brand-blue-bright);
+  font-size:11px;
+  pointer-events:none;
+}
+select{
+  appearance:none;
+  -webkit-appearance:none;
+  -moz-appearance:none;
+  background:rgba(6,10,18,0.35);
+  border:1px solid var(--line);
+  border-radius:5px;
+  color:var(--chalk);
+  font-family:'JetBrains Mono',monospace;
+  font-size:14px;
+  padding:11px 36px 11px 12px;
+  min-height:44px;
+  width:140px;
+  cursor:pointer;
+}
+select:focus{outline:2px solid var(--brand-blue-bright);outline-offset:1px;}
+select:disabled{opacity:.4;cursor:not-allowed;}
+select option{background:var(--panel-navy);color:var(--chalk);}
+
+.slot.mine{border-color:var(--brand-blue-bright);box-shadow:0 0 0 1px var(--brand-blue-bright) inset;}
 .slot .mine-tag{
   display:inline-block;
   font-family:'JetBrains Mono',monospace;
   font-size:9.5px;
   color:var(--ink);
-  background:var(--foil-bright);
+  background:var(--brand-blue-bright);
   padding:1px 6px;
   border-radius:2px;
   margin-left:6px;
   letter-spacing:.02em;
 }
-.stack.mine{border-color:var(--foil-bright);box-shadow:0 0 16px rgba(232,199,102,0.18);}
-.stack-head .owner.mine{color:var(--foil-bright);font-weight:600;}
+.stack.mine{border-color:var(--brand-blue-bright);box-shadow:0 0 16px rgba(127,163,214,0.18);}
+.stack-head .owner.mine{color:var(--brand-blue-bright);font-weight:600;}
 
 .row{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-top:16px;}
 .count-hint{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);}
-.count-hint.warn{color:#ff9d90;}
+.count-hint.warn{color:#ff8a98;}
 
 button{
   font-family:'Oswald',sans-serif;
@@ -147,23 +208,23 @@ button{
   font-weight:600;
   border:none;
   padding:13px 26px;
-  border-radius:3px;
+  border-radius:6px;
   cursor:pointer;
   transition:transform .12s ease, box-shadow .12s ease;
 }
-button:focus-visible{outline:2px solid var(--foil-bright);outline-offset:2px;}
+button:focus-visible{outline:2px solid var(--brand-blue-bright);outline-offset:2px;}
 .btn-primary{
-  background:linear-gradient(135deg,var(--foil-bright),var(--foil));
-  color:var(--ink);
+  background:linear-gradient(135deg,var(--brand-blue-bright),var(--brand-blue));
+  color:#f7faff;
 }
-.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(201,162,39,0.3);}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(76,107,153,0.4);}
 .btn-primary:disabled{opacity:.35;cursor:not-allowed;transform:none;box-shadow:none;}
 .btn-ghost{
   background:transparent;
   border:1px solid var(--line);
   color:var(--chalk);
 }
-.btn-ghost:hover{border-color:var(--foil-bright);color:var(--foil-bright);}
+.btn-ghost:hover{border-color:var(--brand-blue-bright);color:var(--brand-blue-bright);}
 .btn-small{padding:8px 14px;font-size:11px;}
 
 /* ---- Draft board ---- */
@@ -175,9 +236,9 @@ button:focus-visible{outline:2px solid var(--foil-bright);outline-offset:2px;}
 }
 .slot{
   border:1px solid var(--line);
-  border-radius:3px;
+  border-radius:6px;
   padding:12px 12px 14px;
-  background:rgba(0,0,0,0.2);
+  background:rgba(6,10,18,0.3);
   position:relative;
   overflow:hidden;
 }
@@ -205,9 +266,9 @@ button:focus-visible{outline:2px solid var(--foil-bright);outline-offset:2px;}
 }
 .stack{
   border:1px solid var(--line);
-  border-radius:5px;
+  border-radius:7px;
   overflow:hidden;
-  background:rgba(0,0,0,0.22);
+  background:rgba(6,10,18,0.32);
 }
 .stack-head{
   padding:12px 14px;
@@ -221,14 +282,14 @@ button:focus-visible{outline:2px solid var(--foil-bright);outline-offset:2px;}
 .stack-body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:8px;}
 
 .pull{
-  border-radius:3px;
+  border-radius:5px;
   padding:9px 11px;
   font-size:12.5px;
   display:flex;
   flex-direction:column;
   gap:5px;
   border:1px solid var(--line);
-  background:rgba(246,242,231,0.03);
+  background:rgba(236,240,252,0.03);
   opacity:0;
   transform:translateY(6px);
   animation:reveal .35s ease forwards;
@@ -258,35 +319,35 @@ button:focus-visible{outline:2px solid var(--foil-bright);outline-offset:2px;}
 .pull .rc-badge{
   font-family:'JetBrains Mono',monospace;
   font-size:8.5px;
-  color:var(--foil-bright);
-  border:1px solid var(--foil);
+  color:var(--brand-blue-bright);
+  border:1px solid var(--brand-blue);
   padding:0 4px;
   border-radius:2px;
   margin-left:6px;
   vertical-align:middle;
 }
 .pull.rarity-base{border-color:var(--line);}
-.pull.rarity-base .ptag{background:rgba(246,242,231,0.1);color:var(--muted);}
-.pull.rarity-refractor{border-color:rgba(120,170,220,0.4);}
-.pull.rarity-refractor .ptag{background:rgba(120,170,220,0.18);color:#9cc4ec;}
-.pull.rarity-numbered{border-color:var(--foil);background:rgba(201,162,39,0.08);}
-.pull.rarity-numbered .ptag{background:rgba(201,162,39,0.25);color:var(--foil-bright);}
-.pull.rarity-insert{border-color:rgba(190,140,230,0.45);}
-.pull.rarity-insert .ptag{background:rgba(190,140,230,0.2);color:#d3aef2;}
-.pull.rarity-auto{border-color:var(--rare);background:rgba(184,56,46,0.1);box-shadow:0 0 0 1px rgba(184,56,46,0.25) inset;}
-.pull.rarity-auto .ptag{background:rgba(184,56,46,0.3);color:#ff9d90;}
+.pull.rarity-base .ptag{background:rgba(236,240,252,0.1);color:var(--muted);}
+.pull.rarity-refractor{border-color:rgba(157,184,221,0.45);}
+.pull.rarity-refractor .ptag{background:rgba(157,184,221,0.18);color:var(--light-blue);}
+.pull.rarity-numbered{border-color:var(--brand-blue);background:rgba(76,107,153,0.1);}
+.pull.rarity-numbered .ptag{background:rgba(224,185,63,0.22);color:var(--gold-bright);}
+.pull.rarity-insert{border-color:rgba(150,140,220,0.45);}
+.pull.rarity-insert .ptag{background:rgba(150,140,220,0.2);color:#c3bdf2;}
+.pull.rarity-auto{border-color:var(--red);background:rgba(255,65,91,0.09);box-shadow:0 0 0 1px rgba(255,65,91,0.22) inset;}
+.pull.rarity-auto .ptag{background:rgba(255,65,91,0.28);color:#ffb0ba;}
 .pull.rarity-case_hit{
-  border-color:var(--foil-bright);
-  background:linear-gradient(90deg,rgba(201,162,39,0.22),rgba(184,56,46,0.16));
-  box-shadow:0 0 14px rgba(201,162,39,0.35);
+  border-color:var(--gold-bright);
+  background:linear-gradient(90deg,rgba(224,185,63,0.2),rgba(76,107,153,0.14));
+  box-shadow:0 0 14px rgba(254,213,87,0.3);
 }
-.pull.rarity-case_hit .ptag{background:var(--foil-bright);color:var(--ink);font-weight:700;}
+.pull.rarity-case_hit .ptag{background:var(--gold-bright);color:var(--ink);font-weight:700;}
 
 /* ---- Odds / stats reference box (reused for career bar + settlement) ---- */
 .stats-box{
   border:1px solid var(--line);
-  border-radius:4px;
-  background:rgba(0,0,0,0.2);
+  border-radius:6px;
+  background:rgba(6,10,18,0.28);
   padding:16px 18px;
   margin-bottom:20px;
   font-family:'JetBrains Mono',monospace;
@@ -295,7 +356,7 @@ button:focus-visible{outline:2px solid var(--foil-bright);outline-offset:2px;}
   color:var(--muted);
 }
 .stats-box .stats-title{
-  color:var(--foil-bright);
+  color:var(--brand-blue-bright);
   font-size:11px;
   letter-spacing:.1em;
   margin-bottom:8px;
@@ -306,25 +367,48 @@ button:focus-visible{outline:2px solid var(--foil-bright);outline-offset:2px;}
 .stats-box .odds-row + .odds-row{margin-top:2px;}
 
 /* ---- Career bar ---- */
+.stat-featured-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  margin-top:6px;
+  margin-bottom:12px;
+}
 .stat-grid{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
-  gap:14px;
-  margin-top:6px;
+  gap:12px;
 }
 .stat-cell{
   border:1px solid var(--line);
-  border-radius:3px;
+  border-radius:6px;
   padding:12px 14px;
-  background:rgba(0,0,0,0.18);
+  background:rgba(6,10,18,0.26);
 }
+.stat-cell.featured{
+  border-color:var(--gold);
+  background:linear-gradient(160deg,rgba(224,185,63,0.14),rgba(6,10,18,0.3));
+  padding:14px 14px 16px;
+}
+.stat-cell.featured .lbl{color:var(--gold-bright);}
+.stat-cell.featured .val{font-size:22px;}
 .stat-cell .lbl{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;}
 .stat-cell .val{font-family:'Oswald',sans-serif;font-size:19px;font-weight:600;}
 .stat-cell .val.pos{color:var(--good);}
-.stat-cell .val.neg{color:#ff9d90;}
-.stat-cell .val.gold{color:var(--foil-bright);}
+.stat-cell .val.neg{color:#ff8a98;}
+.stat-cell .val.gold{color:var(--gold-bright);}
 
 /* ---- Bucket list (my pulls) ---- */
+.section-label{
+  font-family:'Oswald',sans-serif;
+  text-transform:uppercase;
+  font-size:14px;
+  letter-spacing:.06em;
+  color:var(--brand-blue-bright);
+  margin:0 0 12px;
+  border-top:1px solid var(--line);
+  padding-top:14px;
+}
 .bucket{margin-top:18px;}
 .bucket-head{
   display:flex;
@@ -337,7 +421,7 @@ button:focus-visible{outline:2px solid var(--foil-bright);outline-offset:2px;}
   text-transform:uppercase;
   font-size:14px;
   letter-spacing:.04em;
-  color:var(--foil-bright);
+  color:var(--brand-blue-bright);
 }
 .bucket-head .bcount{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);}
 .bucket-list{display:flex;flex-direction:column;gap:8px;}
@@ -389,9 +473,9 @@ button:focus-visible{outline:2px solid var(--foil-bright);outline-offset:2px;}
 /* ---- Best hit banner ---- */
 .banner{
   margin-top:26px;
-  border:1px solid var(--foil);
-  background:linear-gradient(120deg,rgba(201,162,39,0.14),rgba(184,56,46,0.08));
-  border-radius:5px;
+  border:1px solid var(--gold);
+  background:linear-gradient(120deg,rgba(224,185,63,0.16),rgba(76,107,153,0.1));
+  border-radius:7px;
   padding:22px 26px;
   display:flex;
   justify-content:space-between;
@@ -399,9 +483,9 @@ button:focus-visible{outline:2px solid var(--foil-bright);outline-offset:2px;}
   flex-wrap:wrap;
   gap:14px;
 }
-.banner .label{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.2em;color:var(--foil-bright);text-transform:uppercase;margin-bottom:6px;}
+.banner .label{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.2em;color:var(--gold-bright);text-transform:uppercase;margin-bottom:6px;}
 .banner .headline{font-family:'Oswald',sans-serif;font-size:22px;font-weight:600;}
-.banner .headline b{color:var(--foil-bright);}
+.banner .headline b{color:var(--gold-bright);}
 .banner .owner-tag{font-size:13px;color:var(--muted);}
 
 .foot-note{
@@ -410,6 +494,63 @@ button:focus-visible{outline:2px solid var(--foil-bright);outline-offset:2px;}
   font-size:12px;
   margin-top:40px;
   line-height:1.7;
+}
+
+/* ---- Premium restrained emphasis for Case Hit / 1-of-1 pulls ---- */
+.pull.rarity-case_hit{
+  position:relative;
+}
+.pull.rarity-case_hit::before{
+  content:'';
+  position:absolute;
+  top:0; left:0; right:0; bottom:0;
+  border-radius:5px;
+  border:1px solid rgba(254,213,87,0.35);
+  pointer-events:none;
+}
+
+/* ============================================================
+   Mobile-first RWD — primary target 375–430px.
+   Desktop (>720px) keeps the original wider information density.
+   ============================================================ */
+@media (max-width: 720px){
+  body{padding:20px 14px 56px;}
+  .hero{padding:4px 0 22px;margin-bottom:22px;}
+  .hero-logo{width:78vw;max-width:300px;max-height:220px;object-fit:contain;margin-bottom:10px;}
+  .panel{padding:18px 16px;margin-bottom:18px;}
+  .panel h2{font-size:17px;}
+
+  .row{gap:10px;}
+  .row > button{width:100%;}
+  .row > .count-hint{width:100%;}
+
+  .field{width:100%;}
+  .field input[type="text"],
+  .field input[type="number"],
+  .select-wrap, .select-wrap select{
+    width:100%;
+    min-width:0;
+  }
+
+  .stat-featured-grid{grid-template-columns:1fr;gap:8px;}
+  .stat-cell.featured .val{font-size:24px;}
+  .stat-grid{grid-template-columns:repeat(2,1fr);gap:10px;}
+  .stat-cell{padding:10px 12px;}
+  .stat-cell .val{font-size:16px;}
+
+  .board{grid-template-columns:repeat(2,1fr);gap:8px;}
+
+  .break-grid{grid-template-columns:1fr;gap:12px;}
+
+  .pull-top{flex-wrap:wrap;}
+  .pull .pname{overflow-wrap:anywhere;}
+  .pull-price{flex-direction:column;align-items:flex-start;gap:3px;}
+
+  .bankrupt .bstat-grid{grid-template-columns:repeat(2,1fr);}
+
+  .banner{flex-direction:column;align-items:flex-start;}
+
+  button, select, input[type="text"], input[type="number"]{min-height:44px;}
 }
 
 @media (prefers-reduced-motion: reduce){
@@ -423,15 +564,14 @@ button:focus-visible{outline:2px solid var(--foil-bright);outline-offset:2px;}
 
   <div class="hero">
     <div class="eyebrow">Random Team Break Simulator · Bankroll Mode</div>
-    <h1>⚾️咖哇棒卡<span>團拆人生</span></h1>
-    <p class="sub">每場固定拆 1 Case（12 箱）2026 Topps Chrome Baseball，真實官方機率，真實選手名單，看你的 $2,000 USD 能撐幾場。（頁面內所有金額皆為美金 USD）</p>
+    <img class="hero-logo" src="data:image/png;base64,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" alt="CAWABANKA BREAKS">
+    <p class="sub" id="hero-sub">每場固定拆 1 Case 2026 Topps Chrome Baseball Jumbo，真實官方機率、真實選手名單，看你的 $2,000 USD 能撐幾場。</p>
   </div>
 
   <!-- Career bar -->
   <div class="panel" id="career-bar">
-    <h2>生涯紀錄</h2>
-    <p class="desc">資料存在瀏覽器 localStorage，重新整理不會消失。</p>
-    <div class="stat-grid" id="career-grid"></div>
+    <h2>生涯紀錄 <span class="h2-note">資料存在瀏覽器</span></h2>
+    <div id="career-grid"></div>
     <div class="row">
       <button class="btn-ghost btn-small" id="btn-reset-career">🔄 重新開始人生</button>
     </div>
@@ -439,8 +579,8 @@ button:focus-visible{outline:2px solid var(--foil-bright);outline-offset:2px;}
 
   <!-- STEP 1: participants -->
   <div class="panel" id="panel-setup">
-    <h2><span class="num">01</span> 你的參團設定</h2>
-    <p class="desc">本場固定開整箱 Case（2026 Topps Chrome Baseball Jumbo）：8 Boxes × 12 Packs × 11 Cards = 1,056 張卡。你買 1～5 注，每注 $150 USD，隨機分配球隊（30 隊完全等機率）。參團費會在分隊當下立即從現金扣除。（本頁所有金額皆為美金 USD）</p>
+    <h2>我要被安哥虐</h2>
+    <p class="desc">本場固定開完整箱 2026 Topps Chrome Baseball Jumbo：8 Boxes × 12 Packs × 11 Cards = 1,056 張卡。限制買 1～5 注，每注 $150 USD，隨機分配球隊（30 隊完全等機率）。參團費會在分隊當下立即從現金扣除。</p>
     <div class="row" style="margin-top:0;">
       <div class="field">
         <label for="nickname">你的暱稱</label>
@@ -448,7 +588,15 @@ button:focus-visible{outline:2px solid var(--foil-bright);outline-offset:2px;}
       </div>
       <div class="field">
         <label for="entries">你買幾注（$150/注）</label>
-        <input type="number" id="entries" min="1" max="5" value="2">
+        <div class="select-wrap">
+          <select id="entries">
+            <option value="1" selected>1 注</option>
+            <option value="2">2 注</option>
+            <option value="3">3 注</option>
+            <option value="4">4 注</option>
+            <option value="5">5 注</option>
+          </select>
+        </div>
       </div>
     </div>
     <div class="row">
@@ -459,20 +607,21 @@ button:focus-visible{outline:2px solid var(--foil-bright);outline-offset:2px;}
 
   <!-- STEP 2: draft board -->
   <div class="panel" id="panel-board" style="display:none;">
-    <h2><span class="num">02</span> 你本場抽到</h2>
+    <h2>你本場隨機到</h2>
     <p class="desc">付款已完成，準備開拆。</p>
     <div class="board" id="board"></div>
     <div class="row">
-      <button class="btn-primary" id="btn-break">📦 開拆整箱 Case</button>
+      <button class="btn-primary" id="btn-break">📦 開拆整箱</button>
     </div>
   </div>
 
   <!-- STEP 3: break results -->
   <div class="panel" id="panel-results" style="display:none;">
-    <h2><span class="num">03</span> 拆卡結果</h2>
+    <h2>拆卡結果</h2>
     <p class="desc">機率、選手與 Case 規格完全比照 2026 Topps Chrome Baseball Jumbo 官方數據，逐包獨立模擬，沒有額外加成。</p>
-    <div class="stats-box" id="stats-box"></div>
+    <div class="stats-box" id="stats-box" style="display:none;"></div>
 
+    <h3 class="section-label">我抽到的卡片結果</h3>
     <div id="my-results"></div>
 
     <div class="stats-box" id="settle-box" style="margin-top:22px;"></div>
@@ -1324,6 +1473,445 @@ Tarik Skubal|Detroit Tigers|Paul Skenes|Pittsburgh Pirates
 `;
 
 
+// ---- Additional non-auto Jumbo checklist pools (Variations/Inserts) ----
+const BIGTICKET_RAW = `
+Mike Trout|Los Angeles Angels
+Jacob Misiorowski|Milwaukee Brewers
+Shohei Ohtani|Los Angeles Dodgers
+Gunnar Henderson|Baltimore Orioles
+Elly De La Cruz|Cincinnati Reds
+Corbin Carroll|Arizona Diamondbacks
+Ronald Acuña Jr.|Atlanta Braves
+Mookie Betts|Los Angeles Dodgers
+José Ramírez|Cleveland Guardians
+Francisco Lindor|New York Mets
+Juan Soto|New York Mets
+Jackson Chourio|Milwaukee Brewers
+Pete Crow-Armstrong|Chicago Cubs
+Paul Skenes|Pittsburgh Pirates
+James Wood|Washington Nationals
+Bobby Witt Jr.|Kansas City Royals
+Vladimir Guerrero Jr.|Toronto Blue Jays
+Aaron Judge|New York Yankees
+Bryce Harper|Philadelphia Phillies
+Fernando Tatis Jr.|San Diego Padres
+Julio Rodríguez|Seattle Mariners
+Jac Caglianone|Kansas City Royals
+Roman Anthony|Boston Red Sox
+Chase Burns|Cincinnati Reds
+Samuel Basallo|Baltimore Orioles
+`;
+const WRECKINGCREW_RAW = `
+Aaron Judge|New York Yankees
+Shohei Ohtani|Los Angeles Dodgers
+Kyle Schwarber|Philadelphia Phillies
+Bryce Harper|Philadelphia Phillies
+Cal Raleigh|Seattle Mariners
+Nick Kurtz|Athletics
+Pete Crow-Armstrong|Chicago Cubs
+Giancarlo Stanton|New York Yankees
+Paul Goldschmidt|New York Yankees
+Fernando Tatis Jr.|San Diego Padres
+Byron Buxton|Minnesota Twins
+Jackson Chourio|Milwaukee Brewers
+Freddie Freeman|Los Angeles Dodgers
+Corbin Carroll|Arizona Diamondbacks
+Ketel Marte|Arizona Diamondbacks
+Corey Seager|Texas Rangers
+Oneil Cruz|Pittsburgh Pirates
+Mike Trout|Los Angeles Angels
+Spencer Torkelson|Detroit Tigers
+José Ramírez|Cleveland Guardians
+Bobby Witt Jr.|Kansas City Royals
+Elly De La Cruz|Cincinnati Reds
+Colson Montgomery|Chicago White Sox
+Samuel Basallo|Baltimore Orioles
+Roman Anthony|Boston Red Sox
+`;
+const CHROMERIVALSHOME_RAW = `
+Derek Jeter|New York Yankees
+Roger Clemens|New York Yankees
+Mookie Betts|Los Angeles Dodgers
+Mark McGwire|St. Louis Cardinals
+Sandy Koufax|Los Angeles Dodgers
+Albert Pujols|St. Louis Cardinals
+Brandon Phillips|Cincinnati Reds
+Chase Utley|Philadelphia Phillies
+Rickey Henderson|Athletics
+George Brett|Kansas City Royals
+Nolan Ryan|Texas Rangers
+Pedro Martinez|Boston Red Sox
+Alex Rodriguez|New York Yankees
+Mike Piazza|New York Mets
+Dave Parker|Pittsburgh Pirates
+Reggie Jackson|New York Yankees
+Clayton Kershaw|Los Angeles Dodgers
+Ryne Sandberg|Chicago Cubs
+George Bell|Toronto Blue Jays
+Aaron Judge|New York Yankees
+Mike Schmidt|Philadelphia Phillies
+Jose Altuve|Houston Astros
+Frank Thomas|Chicago White Sox
+Seiya Suzuki|Chicago Cubs
+Shohei Ohtani|Los Angeles Dodgers
+`;
+const WILDSTYLE_RAW = `
+Shohei Ohtani|Los Angeles Dodgers
+Aaron Judge|New York Yankees
+Juan Soto|New York Mets
+Francisco Lindor|New York Mets
+Nick Kurtz|Athletics
+Kazuma Okamoto|Toronto Blue Jays
+Mookie Betts|Los Angeles Dodgers
+Matt Olson|Atlanta Braves
+Freddie Freeman|Los Angeles Dodgers
+Yoshinobu Yamamoto|Los Angeles Dodgers
+Corbin Carroll|Arizona Diamondbacks
+Fernando Tatis Jr.|San Diego Padres
+José Ramírez|Cleveland Guardians
+Julio Rodríguez|Seattle Mariners
+Corey Seager|Texas Rangers
+Pete Crow-Armstrong|Chicago Cubs
+James Wood|Washington Nationals
+Rafael Devers|San Francisco Giants
+Wyatt Langford|Texas Rangers
+Jackson Holliday|Baltimore Orioles
+Samuel Basallo|Baltimore Orioles
+Jac Caglianone|Kansas City Royals
+Roman Anthony|Boston Red Sox
+Colson Montgomery|Chicago White Sox
+Munetaka Murakami|Chicago White Sox
+`;
+const FUTURESTARSPLAIN_RAW = `
+Munetaka Murakami|Chicago White Sox
+Colson Montgomery|Chicago White Sox
+JJ Wetherholt|St. Louis Cardinals
+Samuel Basallo|Baltimore Orioles
+Nick Kurtz|Athletics
+Kevin McGonigle|Detroit Tigers
+Jac Caglianone|Kansas City Royals
+Roman Anthony|Boston Red Sox
+Paul Skenes|Pittsburgh Pirates
+Carson Benge|New York Mets
+`;
+const PERSPECTIVESPLAIN_RAW = `
+Jac Caglianone|Kansas City Royals
+Roman Anthony|Boston Red Sox
+Nick Kurtz|Athletics
+Yoshinobu Yamamoto|Los Angeles Dodgers
+Mike Trout|Los Angeles Angels
+Ronald Acuña Jr.|Atlanta Braves
+Juan Soto|New York Mets
+Paul Skenes|Pittsburgh Pirates
+Albert Pujols|St. Louis Cardinals
+Derek Jeter|New York Yankees
+`;
+const DIAMONDMOMENTS_RAW = `
+Mickey Mantle|New York Yankees
+Willie Mays|San Francisco Giants
+Don Larsen|New York Yankees
+Ted Williams|Boston Red Sox
+Bill Mazeroski|Pittsburgh Pirates
+Roger Maris|New York Yankees
+Sandy Koufax|Los Angeles Dodgers
+Sandy Koufax|Los Angeles Dodgers
+Mickey Mantle|New York Yankees
+Bob Gibson|St. Louis Cardinals
+Willie Mays|San Francisco Giants
+Roberto Clemente|Pittsburgh Pirates
+Hank Aaron|Atlanta Braves
+Reggie Jackson|Athletics
+Carlton Fisk|Boston Red Sox
+Reggie Jackson|New York Yankees
+Ozzie Smith|St. Louis Cardinals
+Kirk Gibson|Los Angeles Dodgers
+Nolan Ryan|Texas Rangers
+Tony Gwynn|San Diego Padres
+Rickey Henderson|Athletics
+Kirby Puckett|Minnesota Twins
+Joe Carter|Toronto Blue Jays
+Cal Ripken Jr.|Baltimore Orioles
+Ken Griffey Jr.|Seattle Mariners
+Tony Gwynn|San Diego Padres
+Kerry Wood|Chicago Cubs
+Mark McGwire|St. Louis Cardinals
+Robin Ventura|New York Mets
+Derek Jeter|New York Yankees
+Ichiro|Seattle Mariners
+Luis Gonzalez|Arizona Diamondbacks
+George Bush|Washington Nationals
+Derek Jeter|New York Yankees
+Manny Ramirez|Boston Red Sox
+David Ortiz|Boston Red Sox
+Sammy Sosa|Texas Rangers
+Ken Griffey Jr.|Cincinnati Reds
+Derek Jeter|New York Yankees
+Miguel Cabrera|Detroit Tigers
+Kris Bryant|Chicago Cubs
+Ichiro|Miami Marlins
+Bartolo Colon|New York Mets
+Pete Alonso|New York Mets
+Albert Pujols|St. Louis Cardinals
+Aaron Judge|New York Yankees
+Shohei Ohtani|Los Angeles Dodgers
+Freddie Freeman|Los Angeles Dodgers
+Freddie Freeman|Los Angeles Dodgers
+Shohei Ohtani|Los Angeles Dodgers
+`;
+const SHADOWETCH_RAW = `
+Shohei Ohtani|Los Angeles Dodgers
+Nick Kurtz|Athletics
+Francisco Lindor|New York Mets
+Juan Soto|New York Mets
+Vladimir Guerrero Jr.|Toronto Blue Jays
+Mookie Betts|Los Angeles Dodgers
+Elly De La Cruz|Cincinnati Reds
+José Ramírez|Cleveland Guardians
+Ronald Acuña Jr.|Atlanta Braves
+Bryce Harper|Philadelphia Phillies
+Corbin Carroll|Arizona Diamondbacks
+Jac Caglianone|Kansas City Royals
+Roman Anthony|Boston Red Sox
+Munetaka Murakami|Chicago White Sox
+Chase DeLauter|Cleveland Guardians
+Jacob Misiorowski|Milwaukee Brewers
+Nolan McLean|New York Mets
+Samuel Basallo|Baltimore Orioles
+Chase Burns|Cincinnati Reds
+Kazuma Okamoto|Toronto Blue Jays
+`;
+const RADIATINGROOKIESPLAIN_RAW = `
+Jac Caglianone|Kansas City Royals
+Roman Anthony|Boston Red Sox
+Bryce Eldridge|San Francisco Giants
+Trey Yesavage|Toronto Blue Jays
+Munetaka Murakami|Chicago White Sox
+Colson Montgomery|Chicago White Sox
+Kyle Teel|Chicago White Sox
+Chase DeLauter|Cleveland Guardians
+Jacob Misiorowski|Milwaukee Brewers
+Bubba Chandler|Pittsburgh Pirates
+Jonah Tong|New York Mets
+Samuel Basallo|Baltimore Orioles
+Owen Caissie|Miami Marlins
+Kevin McGonigle|Detroit Tigers
+JJ Wetherholt|St. Louis Cardinals
+Sal Stewart|Cincinnati Reds
+Carson Benge|New York Mets
+Nolan McLean|New York Mets
+Kazuma Okamoto|Toronto Blue Jays
+Tatsuya Imai|Houston Astros
+`;
+const HOBBYMASTERS_RAW = `
+Shohei Ohtani|Los Angeles Dodgers
+Aaron Judge|New York Yankees
+Francisco Lindor|New York Mets
+Juan Soto|New York Mets
+Fernando Tatis Jr.|San Diego Padres
+Vladimir Guerrero Jr.|Toronto Blue Jays
+Corbin Carroll|Arizona Diamondbacks
+Bobby Witt Jr.|Kansas City Royals
+Paul Skenes|Pittsburgh Pirates
+José Ramírez|Cleveland Guardians
+Cal Raleigh|Seattle Mariners
+Ronald Acuña Jr.|Atlanta Braves
+Bryce Harper|Philadelphia Phillies
+Elly De La Cruz|Cincinnati Reds
+Julio Rodríguez|Seattle Mariners
+Pete Crow-Armstrong|Chicago Cubs
+Bryce Eldridge|San Francisco Giants
+Jac Caglianone|Kansas City Royals
+Roman Anthony|Boston Red Sox
+`;
+const ULTRAVIOLET_RAW = `
+Shohei Ohtani|Los Angeles Dodgers
+Aaron Judge|New York Yankees
+Ronald Acuña Jr.|Atlanta Braves
+Juan Soto|New York Mets
+Yoshinobu Yamamoto|Los Angeles Dodgers
+Vladimir Guerrero Jr.|Toronto Blue Jays
+Munetaka Murakami|Chicago White Sox
+Nick Kurtz|Athletics
+Bobby Witt Jr.|Kansas City Royals
+Bryce Harper|Philadelphia Phillies
+Cal Raleigh|Seattle Mariners
+Jac Caglianone|Kansas City Royals
+Roman Anthony|Boston Red Sox
+Samuel Basallo|Baltimore Orioles
+Paul Skenes|Pittsburgh Pirates
+`;
+const WORLDSERIESATNIGHT_RAW = `
+Shohei Ohtani|Los Angeles Dodgers
+Mookie Betts|Los Angeles Dodgers
+Freddie Freeman|Los Angeles Dodgers
+Yoshinobu Yamamoto|Los Angeles Dodgers
+Will Smith|Los Angeles Dodgers
+George Springer|Toronto Blue Jays
+Max Scherzer|Toronto Blue Jays
+Vladimir Guerrero Jr.|Toronto Blue Jays
+Trey Yesavage|Toronto Blue Jays
+Bo Bichette|Toronto Blue Jays
+`;
+const HELIX_RAW = `
+Shohei Ohtani|Los Angeles Dodgers
+Aaron Judge|New York Yankees
+Bobby Witt Jr.|Kansas City Royals
+Paul Skenes|Pittsburgh Pirates
+Cal Raleigh|Seattle Mariners
+Mike Trout|Los Angeles Angels
+Bryce Harper|Philadelphia Phillies
+Willie Mays|San Francisco Giants
+Roberto Clemente|Pittsburgh Pirates
+Hank Aaron|Atlanta Braves
+Sandy Koufax|Los Angeles Dodgers
+Colson Montgomery|Chicago White Sox
+Samuel Basallo|Baltimore Orioles
+Jac Caglianone|Kansas City Royals
+Roman Anthony|Boston Red Sox
+`;
+const CHAMPIONREFRACTORS_RAW = `
+Shohei Ohtani|Los Angeles Dodgers
+Mookie Betts|Los Angeles Dodgers
+Freddie Freeman|Los Angeles Dodgers
+Yoshinobu Yamamoto|Los Angeles Dodgers
+Will Smith|Los Angeles Dodgers
+Clayton Kershaw|Los Angeles Dodgers
+Tommy Edman|Los Angeles Dodgers
+Kiké Hernández|Los Angeles Dodgers
+Roki Sasaki|Los Angeles Dodgers
+Blake Snell|Los Angeles Dodgers
+Tyler Glasnow|Los Angeles Dodgers
+Andy Pages|Los Angeles Dodgers
+Max Muncy|Los Angeles Dodgers
+Hyeseong Kim|Los Angeles Dodgers
+Miguel Rojas|Los Angeles Dodgers
+`;
+const COOPERSTOWNCALLS25_RAW = `
+Ichiro|Seattle Mariners
+CC Sabathia|New York Yankees
+Billy Wagner|Houston Astros
+Dave Parker|Pittsburgh Pirates
+Dick Allen|Philadelphia Phillies
+`;
+const TOPPSCHROMEEXPOSE_RAW = `
+Shohei Ohtani|Los Angeles Dodgers
+Paul Skenes|Pittsburgh Pirates
+Bobby Witt Jr.|Kansas City Royals
+Elly De La Cruz|Cincinnati Reds
+Pete Crow-Armstrong|Chicago Cubs
+Cal Raleigh|Seattle Mariners
+Bryce Harper|Philadelphia Phillies
+Roman Anthony|Boston Red Sox
+Francisco Lindor|New York Mets
+Jacob Wilson|Athletics
+Jac Caglianone|Kansas City Royals
+Manny Machado|San Diego Padres
+Junior Caminero|Tampa Bay Rays
+Colson Montgomery|Chicago White Sox
+Chase Burns|Cincinnati Reds
+Ronald Acuña Jr.|Atlanta Braves
+Rafael Devers|San Francisco Giants
+Jacob Misiorowski|Milwaukee Brewers
+Trey Yesavage|Toronto Blue Jays
+Owen Caissie|Miami Marlins
+Sal Stewart|Cincinnati Reds
+Jonah Tong|New York Mets
+Carson Williams|Tampa Bay Rays
+Mike Trout|Los Angeles Angels
+Nolan McLean|New York Mets
+Kazuma Okamoto|Toronto Blue Jays
+Corey Seager|Texas Rangers
+Munetaka Murakami|Chicago White Sox
+Max Scherzer|Toronto Blue Jays
+Jakob Marsee|Miami Marlins
+`;
+const IMAGEVARIATIONS_RAW = `
+Shohei Ohtani|Los Angeles Dodgers|0
+Cody Bellinger|New York Yankees|0
+Samuel Basallo|Baltimore Orioles|1
+Cal Raleigh|Seattle Mariners|0
+Bobby Witt Jr.|Kansas City Royals|0
+Kevin McGonigle|Detroit Tigers|1
+Juan Soto|New York Mets|0
+Pete Crow-Armstrong|Chicago Cubs|0
+Tarik Skubal|Detroit Tigers|0
+Jackson Chourio|Milwaukee Brewers|0
+Pete Alonso|Baltimore Orioles|0
+Kyle Teel|Chicago White Sox|1
+Vladimir Guerrero Jr.|Toronto Blue Jays|0
+Yoshinobu Yamamoto|Los Angeles Dodgers|0
+Corbin Carroll|Arizona Diamondbacks|0
+Trey Yesavage|Toronto Blue Jays|1
+Carson Benge|New York Mets|1
+Bubba Chandler|Pittsburgh Pirates|1
+Aaron Judge|New York Yankees|0
+JJ Wetherholt|St. Louis Cardinals|1
+Ronald Acuña Jr.|Atlanta Braves|0
+José Ramírez|Cleveland Guardians|0
+James Wood|Washington Nationals|0
+Junior Caminero|Tampa Bay Rays|0
+Jac Caglianone|Kansas City Royals|1
+Chase Burns|Cincinnati Reds|1
+Jackson Merrill|San Diego Padres|0
+Julio Rodríguez|Seattle Mariners|0
+Paul Skenes|Pittsburgh Pirates|0
+Manny Machado|San Diego Padres|0
+Freddie Freeman|Los Angeles Dodgers|0
+Carson Williams|Tampa Bay Rays|1
+Jacob Misiorowski|Milwaukee Brewers|1
+Mike Trout|Los Angeles Angels|0
+Lawrence Butler|Athletics|0
+Roman Anthony|Boston Red Sox|1
+Jacob Wilson|Athletics|0
+Bryce Harper|Philadelphia Phillies|0
+Nick Kurtz|Athletics|0
+George Springer|Toronto Blue Jays|0
+Bryce Eldridge|San Francisco Giants|1
+Drake Baldwin|Atlanta Braves|0
+Colson Montgomery|Chicago White Sox|1
+Fernando Tatis Jr.|San Diego Padres|0
+Jakob Marsee|Miami Marlins|1
+Jonah Tong|New York Mets|1
+Munetaka Murakami|Chicago White Sox|1
+Elly De La Cruz|Cincinnati Reds|0
+Chase DeLauter|Cleveland Guardians|1
+Francisco Lindor|New York Mets|0
+`;
+const AWARDWINNERS_RAW = `
+Shohei Ohtani|Los Angeles Dodgers
+Tarik Skubal|Detroit Tigers
+Aaron Judge|New York Yankees
+Paul Skenes|Pittsburgh Pirates
+Nick Kurtz|Athletics
+Drake Baldwin|Atlanta Braves
+`;
+const SUPERSHORTPRINTS_RAW = `
+Shohei Ohtani|Los Angeles Dodgers
+Samuel Basallo|Baltimore Orioles
+Bobby Witt Jr.|Kansas City Royals
+Juan Soto|New York Mets
+Aaron Judge|New York Yankees
+Ronald Acuña Jr.|Atlanta Braves
+Jac Caglianone|Kansas City Royals
+Paul Skenes|Pittsburgh Pirates
+Mike Trout|Los Angeles Angels
+Roman Anthony|Boston Red Sox
+`;
+const MINIONS_RAW = `
+Juan Soto|New York Mets
+Aaron Judge|New York Yankees
+Paul Skenes|Pittsburgh Pirates
+Roman Anthony|Boston Red Sox
+`;
+const NUMBERSLIVEFOREVERPLAIN_RAW = `
+Wade Boggs|Boston Red Sox
+Billy Williams|Chicago Cubs
+`;
+const MVPBUYBACKS_RAW = `
+Shohei Ohtani|Los Angeles Dodgers
+Aaron Judge|New York Yankees
+`;
+
 function parseChecklist(raw){
   return raw.trim().split('\n').map(line=>{
     const parts = line.split('|');
@@ -1384,15 +1972,253 @@ const INSERT_SETS = [
     tiers:[
       tier(null, 4, null, 'insert'),
       tier("Green Refractor", 2550, 99, 'insert'),
+      tier("Purple Wave Refractor", 369, 75, 'insert'),
       tier("Purple Refractor", 3364, 75, 'insert'),
-      tier("Gold Refractor", 5067, 50, 'insert'),
+      tier("Gold Wave Refractor", 553, 50, 'insert'),
+      tier("Gold Refractor", 5067, 50, 'case_hit'),
+      tier("Orange Wave Refractor", 1103, 25, 'insert'),
       tier("Orange Refractor", 10133, 25, 'case_hit'),
+      tier("Black Wave Refractor", 2751, 10, 'case_hit'),
       tier("Black Refractor", 25014, 10, 'case_hit'),
+      tier("Red Wave Refractor", 5446, 5, 'case_hit'),
       tier("Red Refractor", 50028, 5, 'case_hit'),
       tier("SuperFractor", 266816, 1, 'case_hit'),
     ]
   },
 ];
+INSERT_SETS.push(
+
+  {
+    key:'bigTicketPlayers', label:"Big Ticket Players", isAuto:false, cards:parsePoolSimple(BIGTICKET_RAW),
+    tiers:[
+      tier(null, 4, null, 'insert'),
+      tier("Green Refractor", 3067, 99, 'insert'),
+      tier("Purple Wave Refractor", 442, 75, 'insert'),
+      tier("Purple Refractor", 4043, 75, 'insert'),
+      tier("Gold Wave Refractor", 663, 50, 'insert'),
+      tier("Gold Refractor", 6064, 50, 'case_hit'),
+      tier("Orange Wave Refractor", 1326, 25, 'insert'),
+      tier("Orange Refractor", 12128, 25, 'case_hit'),
+      tier("Black Wave Refractor", 3295, 10, 'case_hit'),
+      tier("Black Refractor", 30787, 10, 'case_hit'),
+      tier("Red Wave Refractor", 6562, 5, 'case_hit'),
+      tier("Red Refractor", 61573, 5, 'case_hit'),
+      tier("Superfractor", 266816, 1, 'case_hit'),
+    ]
+  },
+  {
+    key:'wreckingCrew', label:"Wrecking Crew", isAuto:false, cards:parsePoolSimple(WRECKINGCREW_RAW),
+    tiers:[
+      tier(null, 4, null, 'insert'),
+      tier("Green Refractor", 3067, 99, 'insert'),
+      tier("Purple Wave Refractor", 442, 75, 'insert'),
+      tier("Purple Refractor", 4043, 75, 'insert'),
+      tier("Gold Wave Refractor", 663, 50, 'insert'),
+      tier("Gold Refractor", 6064, 50, 'case_hit'),
+      tier("Orange Wave Refractor", 1326, 25, 'insert'),
+      tier("Orange Refractor", 12128, 25, 'case_hit'),
+      tier("Black Wave Refractor", 3295, 10, 'case_hit'),
+      tier("Black Refractor", 30787, 10, 'case_hit'),
+      tier("Red Wave Refractor", 6562, 5, 'case_hit'),
+      tier("Red Refractor", 61573, 5, 'case_hit'),
+      tier("Superfractor", 266816, 1, 'case_hit'),
+    ]
+  },
+  {
+    key:'chromeRivalsHome', label:"Chrome Rivals Home", isAuto:false, cards:parsePoolSimple(CHROMERIVALSHOME_RAW),
+    tiers:[
+      tier(null, 24, null, 'insert'),
+      tier("Green Refractor", 674, 99, 'insert'),
+      tier("Purple Refractor", 889, 75, 'insert'),
+      tier("Gold Refractor", 1335, 50, 'insert'),
+      tier("Orange Refractor", 2660, 25, 'case_hit'),
+      tier("Black Refractor", 6671, 10, 'case_hit'),
+      tier("Red Refractor", 13341, 5, 'case_hit'),
+      tier("Superfractor", 66704, 1, 'case_hit'),
+    ]
+  },
+  {
+    key:'wildStyle', label:"Wild Style", isAuto:false, cards:parsePoolSimple(WILDSTYLE_RAW),
+    tiers:[
+      tier(null, 24, null, 'insert'),
+      tier("Green Refractor", 674, 99, 'insert'),
+      tier("Purple Refractor", 889, 75, 'insert'),
+      tier("Gold Refractor", 1335, 50, 'insert'),
+      tier("Orange Refractor", 2660, 25, 'case_hit'),
+      tier("Black Refractor", 6671, 10, 'case_hit'),
+      tier("Red Refractor", 13341, 5, 'case_hit'),
+      tier("Superfractor", 66704, 1, 'case_hit'),
+    ]
+  },
+  {
+    key:'futureStarsInsert', label:"Future Stars", isAuto:false, cards:parsePoolSimple(FUTURESTARSPLAIN_RAW),
+    tiers:[
+      tier(null, 10, null, 'insert'),
+      tier("Green Refractor", 7624, 99, 'case_hit'),
+      tier("Purple Wave Refractor", 1103, 75, 'insert'),
+      tier("Purple Refractor", 10133, 75, 'case_hit'),
+      tier("Gold Wave Refractor", 1654, 50, 'insert'),
+      tier("Gold Refractor", 15103, 50, 'case_hit'),
+      tier("Orange Wave Refractor", 3295, 25, 'case_hit'),
+      tier("Orange Refractor", 30787, 25, 'case_hit'),
+      tier("Black Wave Refractor", 8168, 10, 'case_hit'),
+      tier("Black Refractor", 72768, 10, 'case_hit'),
+      tier("Red Wave Refractor", 16336, 5, 'case_hit'),
+      tier("Red Refractor", 160090, 5, 'case_hit'),
+      tier("Superfractor", 800448, 1, 'case_hit'),
+    ]
+  },
+  {
+    key:'perspectivesInsert', label:"Perspectives", isAuto:false, cards:parsePoolSimple(PERSPECTIVESPLAIN_RAW),
+    tiers:[
+      tier(null, 10, null, 'insert'),
+      tier("Green Refractor", 7624, 99, 'case_hit'),
+      tier("Purple Wave Refractor", 1103, 75, 'insert'),
+      tier("Purple Refractor", 10133, 75, 'case_hit'),
+      tier("Gold Wave Refractor", 1654, 50, 'insert'),
+      tier("Gold Refractor", 15103, 50, 'case_hit'),
+      tier("Orange Wave Refractor", 3295, 25, 'case_hit'),
+      tier("Orange Refractor", 30787, 25, 'case_hit'),
+      tier("Black Wave Refractor", 8168, 10, 'case_hit'),
+      tier("Black Refractor", 72768, 10, 'case_hit'),
+      tier("Red Wave Refractor", 16336, 5, 'case_hit'),
+      tier("Red Refractor", 160090, 5, 'case_hit'),
+      tier("Superfractor", 800448, 1, 'case_hit'),
+    ]
+  },
+  {
+    key:'diamondMoments', label:"Diamond Moments", isAuto:false, cards:parsePoolSimple(DIAMONDMOMENTS_RAW),
+    tiers:[
+      tier(null, 48, null, 'insert'),
+      tier("Purple Refractor", 445, 75, 'insert'),
+      tier("Gold Refractor", 668, 50, 'insert'),
+      tier("Orange Refractor", 1335, 25, 'case_hit'),
+      tier("Black Refractor", 3336, 10, 'case_hit'),
+      tier("Red Refractor", 6671, 5, 'case_hit'),
+      tier("Superfractor", 33352, 1, 'case_hit'),
+    ]
+  },
+  {
+    key:'shadowEtch', label:"Shadow Etch", isAuto:false, cards:parsePoolSimple(SHADOWETCH_RAW),
+    tiers:[
+      tier(null, 192, null, 'insert'),
+      tier("Gold Refractor", 2383, 50, 'case_hit'),
+      tier("Orange Refractor", 4765, 25, 'case_hit'),
+      tier("Black Refractor", 11947, 10, 'case_hit'),
+      tier("Red Refractor", 23543, 5, 'case_hit'),
+      tier("Superfractor", 114350, 1, 'case_hit'),
+    ]
+  },
+  {
+    key:'radiatingRookiesInsert', label:"Topps Chrome Radiating Rookies", isAuto:false, cards:parsePoolSimple(RADIATINGROOKIESPLAIN_RAW),
+    tiers:[
+      tier(null, 192, null, 'insert'),
+      tier("Superfractor", 400224, 1, 'case_hit'),
+    ]
+  },
+  {
+    key:'hobbyMasters', label:"Hobby Masters", isAuto:false, cards:parsePoolSimple(HOBBYMASTERS_RAW),
+    tiers:[
+      tier(null, 418, null, 'insert'),
+      tier("Superfractor", 114350, 1, 'case_hit'),
+    ]
+  },
+  {
+    key:'ultraviolet', label:"Ultraviolet", isAuto:false, cards:parsePoolSimple(ULTRAVIOLET_RAW),
+    tiers:[
+      tier(null, 2243, null, 'insert'),
+      tier("Superfractor", 400224, 1, 'case_hit'),
+    ]
+  },
+  {
+    key:'worldSeriesAtNight', label:"World Series at Night", isAuto:false, cards:parsePoolSimple(WORLDSERIESATNIGHT_RAW),
+    tiers:[
+      tier(null, 2526, null, 'case_hit'),
+    ]
+  },
+  {
+    key:'helix', label:"Helix", isAuto:false, cards:parsePoolSimple(HELIX_RAW),
+    tiers:[
+      tier(null, 5067, null, 'case_hit'),
+      tier("Superfractor", 400224, 1, 'case_hit'),
+    ]
+  },
+  {
+    key:'championRefractors', label:"Topps Chrome Champion Refractors", isAuto:false, cards:parsePoolSimple(CHAMPIONREFRACTORS_RAW),
+    tiers:[
+      tier("Gold Refractor", 9530, 50, 'case_hit'),
+      tier("Gold Superfractor", 400224, 1, 'case_hit'),
+    ]
+  },
+  {
+    key:'cooperstownCalls25', label:"Class of 2025 Cooperstown Calls", isAuto:false, cards:parsePoolSimple(COOPERSTOWNCALLS25_RAW),
+    tiers:[
+      tier(null, 16676, null, 'case_hit'),
+      tier("Green Refractor", 15394, 99, 'case_hit'),
+    ]
+  },
+  {
+    key:'toppsChromeExpose', label:"Topps Chrome Expose", isAuto:false, cards:parsePoolSimple(TOPPSCHROMEEXPOSE_RAW),
+    tiers:[
+      tier(null, 7926, null, 'case_hit'),
+      tier("Red Refractor", 16009, 5, 'case_hit'),
+      tier("Superfractor", 80045, 1, 'case_hit'),
+    ]
+  },
+  {
+    key:'imageVariations', label:"Base Cards Image Variations", isAuto:false, cards:parseChecklist(IMAGEVARIATIONS_RAW),
+    tiers:[
+      tier(null, 152, null, 'insert'),
+      tier("Green Refractor", 1531, 99, 'case_hit'),
+      tier("Purple Refractor", 2022, 75, 'case_hit'),
+      tier("Gold Refractor", 3032, 50, 'case_hit'),
+      tier("Orange Refractor", 6064, 25, 'case_hit'),
+      tier("Black Refractor", 15103, 10, 'case_hit'),
+      tier("Red Refractor", 30787, 5, 'case_hit'),
+      tier("Superfractor", 160090, 1, 'case_hit'),
+    ]
+  },
+  {
+    key:'awardWinnersVariation', label:"Award Winners Base Variation", isAuto:false, cards:parsePoolSimple(AWARDWINNERS_RAW),
+    tiers:[
+      tier(null, 27602, null, 'case_hit'),
+    ]
+  },
+  {
+    key:'superShortPrints', label:"Super Short Prints", isAuto:false, cards:parsePoolSimple(SUPERSHORTPRINTS_RAW),
+    tiers:[
+      tier(null, 7552, null, 'case_hit'),
+    ]
+  },
+  {
+    key:'minions', label:"Minions", isAuto:false, cards:parsePoolSimple(MINIONS_RAW),
+    tiers:[
+      tier(null, 19059, null, 'case_hit'),
+      tier("Red Refractor", 400224, 5, 'case_hit'),
+      tier("Superfractor", 800448, 1, 'case_hit'),
+    ]
+  },
+  {
+    key:'numbersLiveForeverInsert', label:"Numbers Live Forever", isAuto:false, cards:parsePoolSimple(NUMBERSLIVEFOREVERPLAIN_RAW),
+    tiers:[
+      tier(null, 38117, null, 'case_hit'),
+      tier("Gold Refractor", 72768, 50, 'case_hit'),
+      tier("Orange Refractor", 160090, 25, 'case_hit'),
+      tier("Black Refractor", 400224, 10, 'case_hit'),
+      tier("Red Refractor", 800448, 5, 'case_hit'),
+    ]
+  },
+  {
+    key:'mvpBuybacks', label:"2025 Chrome MVP Buybacks", isAuto:false, cards:parsePoolSimple(MVPBUYBACKS_RAW),
+    tiers:[
+      tier("Refractor", 19059, null, 'case_hit'),
+      tier("Prism", 25014, null, 'case_hit'),
+      tier("X Fractor", 38117, null, 'case_hit'),
+      tier("Negative Refractor", 72768, null, 'case_hit'),
+    ]
+  },
+
+);
 
 const AUTO_SETS = [
   {
@@ -1663,6 +2489,31 @@ function rarityBaseValue(odds){
   return 1000;
 }
 
+// ---- SERIAL_VALUE_FLOOR: minimum base value guarantee for numbered/1-of-1 cards ----
+// A card's jumbo-odds-derived base value can be low even when it's a hard-numbered
+// low print run (or a 1/1) purely because that specific tier's pack odds aren't
+// astronomically rare yet. This floor guarantees serials still feel like serials.
+const SERIAL_VALUE_FLOOR = {
+  50: 25,
+  25: 50,
+  10: 100,
+  5: 250,
+  1: 1000
+};
+function serialFloorValue(card){
+  if(card.printRun !== 1){
+    return SERIAL_VALUE_FLOOR[card.printRun] || 0;
+  }
+  const name = `${card.cardType || ''} ${card.parallel || ''}`.toLowerCase();
+  if(card.isAuto && name.includes('superfractor')){
+    return 2000;
+  }
+  if(card.isAuto){
+    return 1500;
+  }
+  return 1000;
+}
+
 // ---- HOBBY_MARKET_TIERS: your own Hobby 卡市熱門 tier list, edit freely ----
 const HOBBY_MARKET_TIERS = {
   // S+ ×3.0
@@ -1759,21 +2610,21 @@ function buildNonAutoPool(){
   const list = [];
   INSERT_SETS.forEach(set=>{
     set.tiers.forEach(t=> list.push({
-      parallel:t.parallel, odds:t.odds, printRun:t.printRun, bucket:t.bucket,
+      parallel:t.parallel, odds:t.odds, printRun:t.printRun,
       cardType:set.label, cards:set.cards, dual:!!set.dual, category:'Insert',
       isAuto:false, isRC:false, oneOfOne:!!t.printRun && t.printRun===1
     }));
   });
   AUTO_SETS.filter(s=>!s.isAuto).forEach(set=>{
     set.tiers.forEach(t=> list.push({
-      parallel:t.parallel, odds:t.odds, printRun:t.printRun, bucket:t.bucket,
+      parallel:t.parallel, odds:t.odds, printRun:t.printRun,
       cardType:set.label, cards:set.cards, dual:!!set.dual, category:'Memorabilia',
       isAuto:false, isRC:false, oneOfOne:!!t.printRun && t.printRun===1
     }));
   });
   PARALLEL_POOL.forEach(pp=>{
     list.push({
-      parallel:pp.name, odds:pp.odds, printRun:pp.printRun, bucket:pp.bucket,
+      parallel:pp.name, odds:pp.odds, printRun:pp.printRun,
       cardType:'Base', cards:null, dual:false, category:'Parallel',
       isAuto:false, isRC:false, oneOfOne:!!pp.printRun && pp.printRun===1
     });
@@ -1785,7 +2636,7 @@ function buildAutoPool(){
   AUTO_SETS.filter(s=>s.isAuto).forEach(set=>{
     const category = set.label.indexOf('Logoman') !== -1 ? 'Memorabilia' : 'Autographs';
     set.tiers.forEach(t=> list.push({
-      parallel:t.parallel, odds:t.odds, printRun:t.printRun, bucket:t.bucket,
+      parallel:t.parallel, odds:t.odds, printRun:t.printRun,
       cardType:set.label, cards:set.cards, dual:!!set.dual, category,
       isAuto:true, isRC:!!set.isRC, oneOfOne:!!set.oneOfOne || (!!t.printRun && t.printRun===1)
     }));
@@ -1832,39 +2683,73 @@ function resolvePlayer(t){
   return {name: entry.name, teams: [entry.team], isRC: !!t.isRC};
 }
 
-// Builds a priced card object, or null if a numbered variant's print run is
-// already fully claimed in this life (see USED_SERIALS above).
-function buildCard(t, p, isAutoSlot){
-  let serial = null;
-  if(t.printRun){
-    const claimed = claimSerial(YEAR, SET_NAME, p.name, t.cardType, t.parallel, t.printRun);
-    if(claimed == null) return null;
-    serial = t.printRun === 1 ? '1/1' : `${claimed}/${t.printRun}`;
-  }
-  const base = rarityBaseValue(t.odds);
+// Display bucket is derived from odds/category/isAuto at build time, not a
+// static label on the tier — so "numbered" vs "case_hit" is judged the same
+// way everywhere. Only genuinely rare odds (>= CASE_HIT_ODDS_THRESHOLD)
+// become a Case Hit; a numbered Auto like a Gold /50 stays in the Auto
+// bucket like any other common Auto pull.
+const CASE_HIT_ODDS_THRESHOLD = 3000;
+function classifyBucket(category, isAuto, odds, printRun){
+  if(odds >= CASE_HIT_ODDS_THRESHOLD) return 'case_hit';
+  if(isAuto) return 'auto';
+  if(category === 'Insert' || category === 'Memorabilia') return 'insert';
+  if(printRun) return 'numbered';
+  return 'refractor';
+}
+
+// Formats a fully-resolved slot (player + team + serial already decided) into
+// a priced, displayable card object.
+function finalizeCard(t, p, serial, isAutoSlot){
+  const bucket = classifyBucket(t.category, isAutoSlot, t.odds, t.printRun);
+  const oddsBase = rarityBaseValue(t.odds);
+  const serialFloor = serialFloorValue({printRun: t.printRun, cardType: t.cardType, parallel: t.parallel, isAuto: isAutoSlot});
+  const effectiveBase = Math.max(oddsBase, serialFloor);
   const mult = playerMultiplier(p.name);
-  const buyback = Math.round(base * mult * 100) / 100;
+  const buyback = Math.round(effectiveBase * mult * 100) / 100;
   return {
     year: YEAR, set: SET_NAME, player: p.name, team: p.teams.filter(Boolean).join('/'),
     category: t.category, cardType: t.cardType, parallel: t.parallel, printRun: t.printRun,
     serialNumber: serial, isAuto: isAutoSlot, isRC: p.isRC,
-    jumboOdds: t.odds, rarityBaseValue: base, playerMultiplier: mult,
-    buyback, bucket: t.bucket
+    jumboOdds: t.odds, rarityBaseValue: oddsBase, serialFloor, effectiveBase, playerMultiplier: mult,
+    buyback, bucket
   };
 }
 
+// ============================================================================
+// Every physical card slot in the whole Case is resolved — player decided,
+// and if numbered, its serial claimed from USED_SERIALS — BEFORE we ever
+// check whose team it belongs to. This is what makes serial numbers globally
+// unique for the life: even a numbered card that lands on a bot's team still
+// permanently consumes that serial, and if a print run is already exhausted
+// the slot simply can't produce that card for ANYONE, regardless of owner.
+// Only after that is a card kept (and priced) for display, and only if it
+// belongs to one of the player's own teams — everything else is generated,
+// consumes its serial if numbered, and is discarded without ever reaching
+// the UI.
+// ============================================================================
 function simulateCandidates(myTeams){
   const myTeamSet = new Set(myTeams);
   const candidates = [];
   const myBase = [];
 
+  function resolveSlot(t){
+    const p = resolvePlayer(t);
+    let serial = null;
+    if(t.printRun){
+      const claimed = claimSerial(YEAR, SET_NAME, p.name, t.cardType, t.parallel, t.printRun);
+      if(claimed == null) return null; // print run exhausted — this exact card cannot be produced, for anyone
+      serial = t.printRun === 1 ? '1/1' : `${claimed}/${t.printRun}`;
+    }
+    return {p, serial};
+  }
+
   for(let b=0; b<CASE_BOXES; b++){
     for(let i=0; i<BOX_AUTO_GUARANTEE; i++){
       const t = weightedPickTier(AUTO_POOL);
-      const p = resolvePlayer(t);
-      if(p.teams.some(tm=>tm && myTeamSet.has(tm))){
-        const card = buildCard(t, p, true);
-        if(card) candidates.push(card);
+      const resolved = resolveSlot(t);
+      if(!resolved) continue;
+      if(resolved.p.teams.some(tm=>tm && myTeamSet.has(tm))){
+        candidates.push(finalizeCard(t, resolved.p, resolved.serial, true));
       }
     }
     for(let i=0; i<NONAUTO_SLOTS_PER_BOX; i++){
@@ -1876,10 +2761,10 @@ function simulateCandidates(myTeams){
         }
         continue;
       }
-      const p = resolvePlayer(t);
-      if(p.teams.some(tm=>tm && myTeamSet.has(tm))){
-        const card = buildCard(t, p, false);
-        if(card) candidates.push(card);
+      const resolved = resolveSlot(t);
+      if(!resolved) continue;
+      if(resolved.p.teams.some(tm=>tm && myTeamSet.has(tm))){
+        candidates.push(finalizeCard(t, resolved.p, resolved.serial, false));
       }
     }
   }
@@ -1896,45 +2781,62 @@ function simulateCase(myTeams){
 
 // ============================================================================
 // Developer-only odds verification. Not wired to any UI button — open the
-// browser console and call devTestOdds() (optionally devTestOdds(200000) for
-// a specific pack count). Simulates that many packs' worth of slots and
-// prints observed vs official Jumbo odds per variant.
+// browser console and call devTestOdds() (defaults to 1,000,000 packs;
+// pass a number for a different target). Simulates that many packs' worth
+// of slots — using the exact same weighted draw functions as real gameplay,
+// with no ownership filtering — and prints observed vs official Jumbo odds
+// per variant, plus per-box averages by display bucket.
 // ============================================================================
 function devTestOdds(targetPacks){
-  targetPacks = targetPacks || 100000;
+  targetPacks = targetPacks || 1000000;
   const boxCount = Math.ceil(targetPacks / BOX_PACKS);
   const allTiers = [...NONAUTO_POOL, ...AUTO_POOL];
   const counts = new Map();
   allTiers.forEach(t=> counts.set(t, 0));
   let baseCount = 0;
+  let autoSlotsTotal = 0;
+  const bucketTotals = {refractor:0, numbered:0, insert:0, auto:0, case_hit:0};
 
   for(let b=0; b<boxCount; b++){
     for(let i=0; i<BOX_AUTO_GUARANTEE; i++){
       const t = weightedPickTier(AUTO_POOL);
       counts.set(t, counts.get(t) + 1);
+      autoSlotsTotal++;
+      bucketTotals[classifyBucket(t.category, true, t.odds, t.printRun)]++;
     }
     for(let i=0; i<NONAUTO_SLOTS_PER_BOX; i++){
       const t = pickNonAutoSlot();
       if(t === null){ baseCount++; continue; }
       counts.set(t, counts.get(t) + 1);
+      bucketTotals[classifyBucket(t.category, false, t.odds, t.printRun)]++;
     }
   }
 
   const totalPacks = boxCount * BOX_PACKS;
   const rows = allTiers.map(t=>{
     const hits = counts.get(t);
-    const observedOdds = hits > 0 ? Math.round(totalPacks / hits) : null;
+    const observedOdds = hits > 0 ? (totalPacks / hits) : null;
+    const errorPercent = observedOdds != null ? (((observedOdds - t.odds) / t.odds) * 100) : null;
     return {
-      variant: `${t.cardType} · ${t.parallel || 'base'}`,
-      officialOdds: '1:' + t.odds,
-      observedOdds: observedOdds ? ('1:' + observedOdds) : 'no hits',
-      hits
+      cardType: t.cardType,
+      parallel: t.parallel || 'base',
+      officialOdds: '1:' + fmt(t.odds),
+      simulatedHits: hits,
+      observedOdds: observedOdds != null ? ('1:' + fmt(Math.round(observedOdds))) : 'no hits',
+      errorPercent: errorPercent != null ? (errorPercent.toFixed(1) + '%') : 'n/a'
     };
   });
-  console.log(`devTestOdds: simulated ${boxCount} boxes (${totalPacks} packs)`);
+
+  console.log(`devTestOdds: simulated ${fmt(boxCount)} boxes (${fmt(totalPacks)} packs)`);
   console.table(rows);
-  console.log('Base cards:', baseCount, '/', boxCount * NONAUTO_SLOTS_PER_BOX,
+  console.log('Base cards:', fmt(baseCount), '/', fmt(boxCount * NONAUTO_SLOTS_PER_BOX),
     '=', (baseCount / (boxCount * NONAUTO_SLOTS_PER_BOX) * 100).toFixed(2) + '%');
+  console.log('--- per-box averages ---');
+  console.log('Auto / box:', (autoSlotsTotal / boxCount).toFixed(2), '(target', BOX_AUTO_GUARANTEE.toFixed(2) + ')');
+  console.log('Refractor / box:', (bucketTotals.refractor / boxCount).toFixed(2));
+  console.log('Numbered / box:', (bucketTotals.numbered / boxCount).toFixed(2));
+  console.log('Insert / box:', (bucketTotals.insert / boxCount).toFixed(2));
+  console.log('Case Hit / box:', (bucketTotals.case_hit / boxCount).toFixed(2));
   return rows;
 }
 if(typeof window !== 'undefined') window.devTestOdds = devTestOdds;
@@ -1956,19 +2858,22 @@ let lastCost = 0;
 function isBankrupt(){ return career.cash < ENTRY_PRICE; }
 
 function renderCareerBar(){
-  const net = career.totalPayout - career.totalSpent;
+  const net = career.totalPayout - career.totalSpent; // internal calc unchanged — just not labeled as "recovery" in the UI
   const roi = career.totalSpent > 0 ? (net / career.totalSpent * 100) : 0;
   const grid = document.getElementById('career-grid');
   grid.innerHTML = `
-    <div class="stat-cell"><div class="lbl">起始資金</div><div class="val">${money(career.startingCash)}</div></div>
-    <div class="stat-cell"><div class="lbl">目前現金</div><div class="val gold">${money(career.cash)}</div></div>
-    <div class="stat-cell"><div class="lbl">已參團場數</div><div class="val">${career.gamesPlayed}</div></div>
-    <div class="stat-cell"><div class="lbl">累計投入</div><div class="val">${money(career.totalSpent)}</div></div>
-    <div class="stat-cell"><div class="lbl">累計卡片市值</div><div class="val">${money(career.totalMarketValue)}</div></div>
-    <div class="stat-cell"><div class="lbl">累計實際回收</div><div class="val">${money(career.totalPayout)}</div></div>
-    <div class="stat-cell"><div class="lbl">累計損益</div><div class="val ${net>=0?'pos':'neg'}">${money(net)}</div></div>
-    <div class="stat-cell"><div class="lbl">ROI</div><div class="val ${roi>=0?'pos':'neg'}">${roi.toFixed(1)}%</div></div>
-    <div class="stat-cell"><div class="lbl">生涯最佳拉卡</div><div class="val gold" style="font-size:13px;line-height:1.4;">${career.bestPull ? career.bestPull.title + '（' + money(career.bestPull.price) + '）' : '尚無紀錄'}</div></div>
+    <div class="stat-featured-grid">
+      <div class="stat-cell featured"><div class="lbl">目前現金</div><div class="val gold">${money(career.cash)}</div></div>
+      <div class="stat-cell featured"><div class="lbl">累計卡片市值</div><div class="val">${money(career.totalMarketValue)}</div></div>
+      <div class="stat-cell featured"><div class="lbl">生涯損益</div><div class="val ${net>=0?'pos':'neg'}">${money(net)}</div></div>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-cell"><div class="lbl">起始資金</div><div class="val">${money(career.startingCash)}</div></div>
+      <div class="stat-cell"><div class="lbl">已參團場數</div><div class="val">${career.gamesPlayed}</div></div>
+      <div class="stat-cell"><div class="lbl">累計投入</div><div class="val">${money(career.totalSpent)}</div></div>
+      <div class="stat-cell"><div class="lbl">生涯 ROI</div><div class="val ${roi>=0?'pos':'neg'}">${roi.toFixed(1)}%</div></div>
+      <div class="stat-cell" style="grid-column:1/-1;"><div class="lbl">生涯最佳卡</div><div class="val gold" style="font-size:13px;line-height:1.4;">${career.bestPull ? career.bestPull.title + '（' + money(career.bestPull.price) + '）' : '尚無紀錄'}</div></div>
+    </div>
   `;
 }
 
@@ -2025,7 +2930,7 @@ function renderBankruptScreen(){
     <div class="stat-cell"><div class="lbl">起始資金</div><div class="val">${money(career.startingCash)}</div></div>
     <div class="stat-cell"><div class="lbl">累計投入</div><div class="val">${money(career.totalSpent)}</div></div>
     <div class="stat-cell"><div class="lbl">累計回收</div><div class="val">${money(career.totalPayout)}</div></div>
-    <div class="stat-cell" style="grid-column:1/-1;"><div class="lbl">生涯最佳拉卡</div><div class="val gold" style="font-size:14px;">${career.bestPull ? career.bestPull.title + '（' + money(career.bestPull.price) + '）' : '尚無紀錄'}</div></div>
+    <div class="stat-cell" style="grid-column:1/-1;"><div class="lbl">生涯最佳卡</div><div class="val gold" style="font-size:14px;">${career.bestPull ? career.bestPull.title + '（' + money(career.bestPull.price) + '）' : '尚無紀錄'}</div></div>
   `;
   document.getElementById('panel-setup').style.display = 'none';
   document.getElementById('panel-board').style.display = 'none';
@@ -2059,6 +2964,7 @@ function updateEntryUI(){
   }
 }
 document.getElementById('entries').addEventListener('input', updateEntryUI);
+document.getElementById('entries').addEventListener('change', updateEntryUI);
 
 // Random Team: 30 teams, exactly equal probability, drawn with
 // crypto.getRandomValues() rather than Math.random(). No popularity weighting,
@@ -2113,10 +3019,10 @@ function renderStatsBox(){
   box.innerHTML = `
     <div class="stats-title">本場規格與官方 Jumbo Pack Odds（2026 Topps Chrome Baseball）</div>
     <div class="odds-row"><span>Case 結構</span><span><b>${CASE_BOXES}</b> Boxes × ${BOX_PACKS} Packs × ${PACK_CARDS} Cards = <b>${fmt(CASE_PACKS)}</b> Packs / <b>${fmt(CASE_CARDS)}</b> Cards</span></div>
-    <div class="odds-row"><span>簽名保底</span><span>每箱固定 <b>${BOX_AUTO_GUARANTEE}</b> 張，直接從 Auto 系列加權抽出，不獨立 Roll 全部系列再補</span></div>
+    <div class="odds-row"><span>簽名保底</span><span>每盒固定 <b>2</b> 張 Auto；每 Case ${CASE_BOXES} 盒，共 <b>${fmt(CASE_BOXES*BOX_AUTO_GUARANTEE)}</b> 張 Auto。（直接從 Auto 系列加權抽出，不獨立 Roll 全部系列再補）</span></div>
     <div class="odds-row"><span>主要 Refractor</span><span>Refractor 1:1｜Negative 1:63｜Pink /250 1:102｜Aqua /199 1:127｜Blue /150 1:168｜Green /99 1:256｜Gold /50 1:506｜Orange /25 1:1,011</span></div>
     <div class="odds-row"><span>Case Hit 平行卡</span><span>Black /10 1:2,518｜Red /5 1:5,035｜Printing Plates 1/1 1:6,353｜FrozenFractor 1:927｜SuperFractor 1/1 1:24,256</span></div>
-    <div class="odds-row"><span>Insert</span><span>1991 Topps Baseball 1:4</span></div>
+    <div class="odds-row"><span>Insert / Variation</span><span>依 2026 Topps Chrome Baseball Jumbo 官方 checklist 與 Jumbo odds 模擬</span></div>
     <div class="odds-row"><span>簽名卡</span><span>Rookie Autographs 1:14｜Ink Strokes 1:153｜75th Diamond 1:294｜Chromographs 1:1,682｜World Series Champions 1:1,304</span></div>
     <div class="odds-row"><span>終極 Case Hit</span><span>Gold Logoman Relic 1:100,056｜Gold Logoman Autograph Relic 1:400,224（整場幾乎不會出現，這就是真實比例）</span></div>
     <div class="odds-row"><span>限量卡序號</span><span>同一人生內每個 /X 序號終身唯一，抽過的號碼不會再出現，整個印刷量用完該版本就永久停產</span></div>
@@ -2125,9 +3031,13 @@ function renderStatsBox(){
 }
 
 function cardDetailBlock(c){
+  const floorLine = c.serialFloor > c.rarityBaseValue
+    ? `<span class="pmeta">限編保障：${money(c.serialFloor)}</span>`
+    : '';
   return `
     <span>Jumbo Odds：1:${fmt(c.jumboOdds)}</span>
     <span class="pmeta">基礎價：${money(c.rarityBaseValue)}</span>
+    ${floorLine}
     <span class="pmeta">市場熱度：${hobbyTier(c.player)} ×${c.playerMultiplier}</span>
     <span class="pmeta">系統買回：${money(c.buyback)}</span>
   `;
@@ -2140,7 +3050,7 @@ function renderBucket(container, bucketKey, items){
   const list = document.createElement('div');
   list.className = 'bucket-list';
   if(items.length === 0){
-    list.innerHTML = `<div class="bucket-empty">本場沒拉到</div>`;
+    list.innerHTML = `<div class="bucket-empty">本場沒抽到</div>`;
   } else {
     items.forEach(it=>{
       const div = document.createElement('div');
@@ -2242,7 +3152,7 @@ function doBreak(){
     banner.style.display = 'flex';
     banner.innerHTML = `
       <div>
-        <div class="label">🏆 本場最佳拉卡</div>
+        <div class="label">🏆 本場最佳卡</div>
         <div class="headline">${best.player}${best.parallel ? ' · ' + best.parallel : ''}${best.serialNumber ? ' · ' + best.serialNumber : ''}</div>
       </div>
       <div class="owner-tag">系統買回 ${money(best.buyback)}</div>
