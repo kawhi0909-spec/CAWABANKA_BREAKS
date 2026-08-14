@@ -2555,6 +2555,7 @@ const HOBBY_MARKET_TIERS = {
   "Kevin McGonigle": 2.3,
   "Cal Ripken Jr.": 2.3,
   "David Ortiz": 2.3,
+  "Jacob Misiorowski": 2.3,
 
   // A ×1.7
   "Juan Soto": 1.7,
@@ -2565,7 +2566,6 @@ const HOBBY_MARKET_TIERS = {
   "JJ Wetherholt": 1.7,
   "Samuel Basallo": 1.7,
   "Chase Burns": 1.7,
-  "Jacob Misiorowski": 1.7,
   "Nick Kurtz": 1.7,
   "Junior Caminero": 1.7,
   "Jackson Holliday": 1.7,
@@ -2641,6 +2641,27 @@ function cardTypeMultiplier(card){
     return CARD_TYPE_MULTIPLIER.insertMemorabilia;
   }
   return CARD_TYPE_MULTIPLIER.baseRefractor;
+}
+
+// ---- AUTO_MARKET_FLOOR: final-value floor for Auto cards, keyed by Hobby
+// market tier and whether the card is an RC. This is NOT multiplied by
+// cardTypeMultiplier or playerMultiplier — it's compared directly against
+// the fully-computed formula value, and the higher of the two wins. ----
+const AUTO_MARKET_FLOOR = {
+  cold:    {base:30,  rc:80},
+  normal:  {base:50,  rc:120},
+  B:       {base:75,  rc:180},
+  A:       {base:120, rc:250},
+  S:       {base:250, rc:500},
+  "S+":    {base:400, rc:800},
+};
+function autoMarketFloor(card){
+  if(!card.isAuto) return 0;
+  const tier = hobbyTier(card.player); // "S+"|"S"|"A"|"B"|"一般"|"冷門"
+  const key = tier === '一般' ? 'normal' : (tier === '冷門' ? 'cold' : tier);
+  const entry = AUTO_MARKET_FLOOR[key];
+  if(!entry) return 0;
+  return card.isRC ? entry.rc : entry.base;
 }
 
 // ============================================================================
@@ -2756,12 +2777,15 @@ function finalizeCard(t, p, serial, isAutoSlot){
   const effectiveBase = Math.max(oddsBase, serialFloor);
   const typeMult = cardTypeMultiplier({isAuto: isAutoSlot, printRun: t.printRun, bucket, category: t.category});
   const mult = playerMultiplier(p.name);
-  const buyback = Math.round(effectiveBase * typeMult * mult * 100) / 100;
+  const formulaValue = Math.round(effectiveBase * typeMult * mult * 100) / 100;
+  const floor = autoMarketFloor({isAuto: isAutoSlot, player: p.name, isRC: p.isRC});
+  const buyback = Math.max(formulaValue, floor);
   return {
     year: YEAR, set: SET_NAME, player: p.name, team: p.teams.filter(Boolean).join('/'),
     category: t.category, cardType: t.cardType, parallel: t.parallel, printRun: t.printRun,
     serialNumber: serial, isAuto: isAutoSlot, isRC: p.isRC,
     jumboOdds: t.odds, rarityBaseValue: oddsBase, serialFloor, effectiveBase, cardTypeMultiplier: typeMult, playerMultiplier: mult,
+    formulaValue, autoMarketFloorValue: floor,
     buyback, bucket
   };
 }
@@ -3087,12 +3111,16 @@ function cardDetailBlock(c){
   const floorLine = c.serialFloor > c.rarityBaseValue
     ? `<span class="pmeta">限編保障：${money(c.serialFloor)}</span>`
     : '';
+  const autoFloorLine = (c.isAuto && c.autoMarketFloorValue > c.formulaValue)
+    ? `<span class="pmeta">Auto 市場底價：${money(c.autoMarketFloorValue)}</span>`
+    : '';
   return `
     <span>Jumbo Odds：1:${fmt(c.jumboOdds)}</span>
     <span class="pmeta">基礎價：${money(c.rarityBaseValue)}</span>
     ${floorLine}
     <span class="pmeta">卡種倍率：×${c.cardTypeMultiplier}</span>
     <span class="pmeta">市場熱度：${hobbyTier(c.player)} ×${c.playerMultiplier}</span>
+    ${autoFloorLine}
     <span class="pmeta">系統估值：${money(c.buyback)}</span>
   `;
 }
